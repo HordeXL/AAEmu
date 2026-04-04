@@ -25,7 +25,7 @@ public class QuestActSupplyItem(QuestComponentTemplate parentComponent) : QuestA
     /// <returns>False if it failed to provide the item</returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), ItemId {ItemId}, GradeId {GradeId}, Count {Count}, ShowActionBar {ShowActionBar}, Cleanup {Cleanup}, DropWhenDestroy {DropWhenDestroy}, DestroyWhenDrop {DestroyWhenDrop}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，物品 ID {ItemId}，品质 ID {GradeId}，数量 {Count}，显示动作栏 {ShowActionBar}，清理 {Cleanup}，摧毁时丢弃 {DropWhenDestroy}，丢弃时摧毁 {DestroyWhenDrop}");
 
         var toAddCount = Count;
 

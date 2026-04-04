@@ -19,7 +19,7 @@ public class QuestActObjTalkNpcGroup(QuestComponentTemplate parentComponent) : Q
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), NpcGroupId {NpcGroupId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，NPC 组 ID {NpcGroupId}");
         return currentObjectiveCount > 0;
     }
 
@@ -41,7 +41,7 @@ public class QuestActObjTalkNpcGroup(QuestComponentTemplate parentComponent) : Q
             return;
 
         var player = questAct.QuestComponent.Parent.Parent.Owner;
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnTalkNpcGroupMade: Quest: {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {player.Name} ({player.Id}), NpcGroupId {args.NpcGroupId}, NpcId {args.NpcId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnTalkNpcGroupMade: 任务：{questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {player.Name} ({player.Id})，NPC 组 ID {args.NpcGroupId}，NPC ID {args.NpcId}");
         SetObjective(questAct, 1);
     }
 }

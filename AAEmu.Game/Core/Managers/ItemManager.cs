@@ -380,7 +380,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
         {
             if (!_allItems.TryAdd(item.Id, item))
             {
-                Logger.Error($"Failed to load item with ID {item.Id}, possible duplicate entries!");
+                Logger.Error($"加载物品 ID {item.Id} 失败，可能有条目重复！");
                 return null;
             }
         }
@@ -394,7 +394,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
 
         if (!_allItems.TryAdd(item.Id, item))
         {
-            Logger.Error($"Failed to load item with ID {item.Id}, possible duplicate entries!");
+            Logger.Error($"加载物品 ID {item.Id} 失败，可能有条目重复！");
             return false;
         }
         return true;
@@ -405,6 +405,8 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
         if (_loaded)
             return;
 
+        // Initialize _allItems dictionary early to prevent null reference exceptions
+        _allItems = [];
         _grades = [];
         _holdables = [];
         _wearables = [];
@@ -442,7 +444,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
         skillManager.OnSkillsLoaded += OnSkillsLoaded;
         using (var connection = SQLite.CreateConnection())
         {
-            Logger.Info("Loading item templates ...");
+            Logger.Info("正在加载物品模板 ...");
 
             // Read configuration related to item durability and the likes
             using (var command = connection.CreateCommand())
@@ -1365,7 +1367,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                         };
 
                         if (!_itemSets.TryAdd(entry.Id, entry))
-                            Logger.Warn($"Duplicate entry for item_sets {entry.Id}");
+                            Logger.Warn($"item_sets 中存在重复条目 {entry.Id}");
                     }
                 }
             }
@@ -1392,7 +1394,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                         }
                         else
                         {
-                            Logger.Warn($"Missing item set entry for item_set_items {entry.Id}");
+                            Logger.Warn($"缺少 item_set_items 的条目 {entry.Id}");
                         }
 
                     }
@@ -1411,7 +1413,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                 i.Value.searchString = (i.Value.Name + " " + localizationManager.Get("items", "name", i.Value.Id)).ToLower();
             }
 
-            Logger.Info($"Loaded {_templates.Count} item templates (with {invalidItemCount} unused) ...");
+            Logger.Info($"已加载 {_templates.Count} 个物品模板（其中 {invalidItemCount} 个未使用）...");
         }
 
         OnItemsLoaded?.Invoke(this, EventArgs.Empty);
@@ -1448,7 +1450,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                     }
 
                     if (deleteCount != _removedItems.Count)
-                        Logger.Error($"Some items could not be deleted, only {deleteCount}/{_removedItems.Count} items removed !");
+                        Logger.Error($"某些物品无法删除，仅移除了 {deleteCount}/{_removedItems.Count} 个物品！");
                     _removedItems.Clear();
                 }
             }
@@ -1529,7 +1531,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                         // If the slot type changed, give a warning, otherwise skip this save
                         if (item.SlotType != SlotType.None)
                         {
-                            Logger.Warn($"Slot type for {item.Id} was None, changing to {item.SlotType}");
+                            Logger.Warn($"{item.Id} 的插槽类型为 None，正在更改为 {item.SlotType}");
                         }
                         else
                         {
@@ -1538,7 +1540,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                     }
                     if (!Enum.IsDefined(typeof(SlotType), item.SlotType))
                     {
-                        Logger.Warn($"Found SlotType.{item.SlotType} in itemslist, skipping ID:{itemId} - Template:{item.TemplateId}");
+                        Logger.Warn($"在物品列表中发现 SlotType.{item.SlotType}，跳过 ID:{itemId} - Template:{item.TemplateId}");
                         continue;
                     }
 
@@ -1584,7 +1586,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                     {
                         if (command.ExecuteNonQuery() < 1)
                         {
-                            Logger.Error($"Error updating items {item.Id} ({item.TemplateId}) !");
+                            Logger.Error($"更新物品 {item.Id} ({item.TemplateId}) 时出错！");
                         }
                         else
                         {
@@ -1597,7 +1599,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                         // Create a manual SQL string with the data provided
                         var sqlString = $"REPLACE INTO items (id, type, template_id, container_id, slot_type, slot, count, details, lifespan_mins, made_unit_id, unsecure_time, unpack_time, owner, created_at, grade, flags, ucc, expire_time, expire_online_minutes, charge_time, charge_count) VALUES ({item.Id}, {item.GetType()}, {item.TemplateId}, {item._holdingContainer?.ContainerId ?? 0}, {item.SlotType}, {item.Slot}, {item.Count}, {details.GetBytes()}, {item.LifespanMins}, {item.MadeUnitId}, {item.UnsecureTime}, {item.UnpackTime}, {item.CreateTime}, {item.OwnerId}, {item.Grade}, {(byte)item.ItemFlags}, {item.UccId}, {item.ExpirationTime}, {item.ExpirationOnlineMinutesLeft}, {item.ChargeStartTime}, {item.ChargeCount})";
 
-                        Logger.Error($"Error: {ex.Message}\nSQL Query: {sqlString}\n");
+                        Logger.Error($"错误：{ex.Message}\nSQL 查询：{sqlString}\n");
                     }
                     command.Parameters.Clear();
                 }

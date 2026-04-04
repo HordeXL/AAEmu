@@ -20,7 +20,7 @@ public class QuestActConReportNpc(QuestComponentTemplate parentComponent) : Ques
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), NpcId {NpcId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，NPC ID {NpcId}");
         // TODO Verify: Does it actually have to be targeted?
         return questAct.OverrideObjectiveCompleted || (quest.Owner.CurrentTarget is Npc npc && npc.TemplateId == NpcId);
     }
@@ -49,7 +49,7 @@ public class QuestActConReportNpc(QuestComponentTemplate parentComponent) : Ques
             : QuestObjectiveStatus.QuestComplete;
         var isReady = questAct.QuestComponent.Parent.Parent.GetQuestObjectiveStatus() >= minimumProgress;
 
-        Logger.Debug($"QuestActConReportNpc({DetailId}).OnReportNpc: Quest: {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id}), NpcId {args.NpcId}, Selected {args.Selected}, isReady {isReady}");
+        Logger.Debug($"QuestActConReportNpc({DetailId}).OnReportNpc: 任务：{questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})，NPC ID {args.NpcId}，已选择 {args.Selected}，准备就绪 {isReady}");
 
         if (!isReady)
             return;

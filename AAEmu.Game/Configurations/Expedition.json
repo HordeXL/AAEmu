@@ -9,7 +9,7 @@
         "RolePolicies": [
             {
                 "Role": 0,
-                "Name": "Apprentice",
+                "Name": "学徒",
                 "DominionDeclare": true,
                 "Invite": false,
                 "Expel": false,
@@ -22,7 +22,7 @@
             },
             {
                 "Role": 1,
-                "Name": "Member",
+                "Name": "成员",
                 "DominionDeclare": true,
                 "Invite": false,
                 "Expel": false,
@@ -35,7 +35,7 @@
             },
             {
                 "Role": 2,
-                "Name": "Officer",
+                "Name": "官员",
                 "DominionDeclare": true,
                 "Invite": true,
                 "Expel": false,
@@ -48,7 +48,7 @@
             },
             {
                 "Role": 3,
-                "Name": "Commander",
+                "Name": "指挥官",
                 "DominionDeclare": true,
                 "Invite": true,
                 "Expel": true,
@@ -61,7 +61,7 @@
             },
             {
                 "Role": 255,
-                "Name": "General",
+                "Name": "将军",
                 "DominionDeclare": true,
                 "Invite": true,
                 "Expel": true,

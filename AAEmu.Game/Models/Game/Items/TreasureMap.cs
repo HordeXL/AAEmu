@@ -65,7 +65,7 @@ public class TreasureMap : Item
             default:
                 // Invalid category
                 Grade = (byte)ItemGrade.Legendary;
-                Logger.Error($"Generated treasure map data for chest {chestTemplate?.Id} did not have a valid category for chests ({chestTemplate?.GroupId})");
+                Logger.Error($"为宝箱 {chestTemplate?.Id} 生成的藏宝图数据没有有效的类别（{chestTemplate?.GroupId}）");
                 break;
         }
     }

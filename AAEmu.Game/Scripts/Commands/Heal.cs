@@ -25,7 +25,7 @@ public class Heal : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Heals target or self if no target supplied";
+        return "治疗目标或自己（如果未指定目标）";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -45,7 +45,7 @@ public class Heal : ICommand
             {
                 // This check is needed otherwise the player will be kicked
                 CommandManager.SendErrorText(this, messageOutput,
-                    "Cannot heal a dead target, use the revive command instead");
+                    "无法治疗死亡的目标，请使用 revive 命令");
             }
             else
             {

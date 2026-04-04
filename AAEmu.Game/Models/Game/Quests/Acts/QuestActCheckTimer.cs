@@ -48,10 +48,10 @@ public class QuestActCheckTimer(QuestComponentTemplate parentComponent) : QuestA
     public override void InitializeAction(Quest quest, QuestAct questAct)
     {
         base.InitializeAction(quest, questAct);
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).InitializeAction Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id})");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).InitializeAction 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})");
 
         if (!QuestManager.Instance.AddQuestTimer(quest.Owner, quest, LimitTime))
-            Logger.Warn($"{QuestActTemplateName}({DetailId}).InitializeAction Timer Already running, Quest {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id})");
+            Logger.Warn($"{QuestActTemplateName}({DetailId}).InitializeAction 计时器已经在运行，任务 {quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})");
         else
             quest.Owner.Events.OnTimerExpired += questAct.OnTimerExpired;
         quest.Owner.Events.OnQuestStepChanged += questAct.OnQuestStepChanged;
@@ -59,7 +59,7 @@ public class QuestActCheckTimer(QuestComponentTemplate parentComponent) : QuestA
 
     public override void FinalizeAction(Quest quest, QuestAct questAct)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).FinalizeAction Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id})");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).FinalizeAction 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})");
 
         // Don't remove timer on FinalizeAction as it needs to persist as long as the quest is open and not failed or completed
         // quest.Owner.Events.OnTimerExpired -= questAct.OnTimerExpired;
@@ -78,7 +78,7 @@ public class QuestActCheckTimer(QuestComponentTemplate parentComponent) : QuestA
     /// <returns>Always returns true</returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct Quest {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id})");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct 任务 {quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})");
         return true;
     }
 
@@ -93,7 +93,7 @@ public class QuestActCheckTimer(QuestComponentTemplate parentComponent) : QuestA
         if (questAct.Id != ActId)
             return;
 
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnTimerExpired Quest {args.QuestId}, Owner {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnTimerExpired 任务 {args.QuestId}，所有者 {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})");
 
         // NOTE: All the still active quests don't use any of the special parameters that are possible
         // So basically any quest that uses this, makes the quest fail as a result.
@@ -111,7 +111,7 @@ public class QuestActCheckTimer(QuestComponentTemplate parentComponent) : QuestA
         if (questAct.Id != ActId)
             return;
 
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnTimerExpired Quest {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnTimerExpired 任务 {questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})");
         switch (args.Step)
         {
             case QuestComponentKind.None:

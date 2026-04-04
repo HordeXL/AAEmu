@@ -112,14 +112,14 @@ public class Inventory
                 if (!container.AddOrMoveExistingItem(ItemTaskType.Invalid, item, item.Slot))
                 {
                     item._holdingContainer?.RemoveItem(ItemTaskType.Invalid, item, true);
-                    Logger.Error("LoadInventory found unused item type for item, Id {0} ({1}) at {2}:{3} for {4}",
+                    Logger.Error("LoadInventory 发现未使用的物品类型，物品 ID {0} ({1}) 在 {2}:{3} 属于 {4}",
                         item.Id, item.TemplateId, item.SlotType, item.Slot,
                         Owner?.Name ?? "Id:" + item.OwnerId);
                 }
             }
             else
             {
-                Logger.Warn("LoadInventory found unused itemId {0} ({1}) at {2}:{3} for {4}", item.Id,
+                Logger.Warn("LoadInventory 发现未使用的物品 ID {0} ({1}) 在 {2}:{3} 属于 {4}", item.Id,
                     item.TemplateId, item.SlotType, item.Slot, Owner?.Name ?? "Id:" + item.OwnerId);
             }
         }
@@ -277,14 +277,14 @@ public class Inventory
         var fromItem = ItemManager.Instance.GetItemByItemId(fromItemId);
         if (fromItem == null && fromItemId != 0)
         {
-            Logger.Error($"SplitOrMoveItem - ItemId {fromItemId} no longer exists, possibly a phantom item.");
+            Logger.Error($"SplitOrMoveItem - 物品 ID {fromItemId} 不再存在，可能是幽灵物品。");
             return false;
         }
 
         var toItem = ItemManager.Instance.GetItemByItemId(toItemId);
         if (toItem == null && toItemId != 0)
         {
-            Logger.Error($"SplitOrMoveItem - ItemId {toItemId} no longer exists, possibly a phantom item.");
+            Logger.Error($"SplitOrMoveItem - 物品 ID {toItemId} 不再存在，可能是幽灵物品。");
             return false;
         }
 
@@ -303,7 +303,7 @@ public class Inventory
         var fromItem = ItemManager.Instance.GetItemByItemId(fromItemId);
         if (fromItem == null && fromItemId != 0)
         {
-            Logger.Error($"SplitOrMoveItem - ItemId {fromItemId} no longer exists, possibly a phantom item.");
+            Logger.Error($"SplitOrMoveItem - 物品 ID {fromItemId} 不再存在，可能是幽灵物品。");
             return false;
         }
 
@@ -322,12 +322,12 @@ public class Inventory
         // Check if containers can accept the items
         if (targetContainer is not null && !targetContainer.CanAccept(fromItem, toSlot))
         {
-            Logger.Error($"SplitOrMoveItem - fromItemId {fromItemId} is not welcome in this container {targetContainer.ContainerType} ({targetContainer.ContainerId}).");
+            Logger.Error($"SplitOrMoveItem - 物品 ID {fromItemId} 不欢迎进入此容器 {targetContainer.ContainerType} ({targetContainer.ContainerId})。");
             return false;
         }
         if (sourceContainer is not null && !sourceContainer.CanAccept(itemInTargetSlot, fromSlot))
         {
-            Logger.Error($"SplitOrMoveItem - toItemId {toItemId} is not welcome in this container {sourceContainer.ContainerType} ({sourceContainer.ContainerId}).");
+            Logger.Error($"SplitOrMoveItem - 物品 ID {toItemId} 不欢迎进入此容器 {sourceContainer.ContainerType} ({sourceContainer.ContainerId})。");
             return false;
         }
 
@@ -350,28 +350,28 @@ public class Inventory
         // Check some conditions when we are not equipping into an empty slot
         if (action != SwapAction.doEquipInEmptySlot && fromItem == null)
         {
-            Logger.Error("SplitOrMoveItem didn't provide a source itemId");
+            Logger.Error("SplitOrMoveItem 没有提供源物品 ID");
             return false;
         }
 
         // Check if what the client provides as its source container is actually what the server has as data for the item
         if (action != SwapAction.doEquipInEmptySlot && sourceContainer?.ContainerType != fromType)
         {
-            Logger.Error("SplitOrMoveItem Source Item Container did not match what the client asked");
+            Logger.Error("SplitOrMoveItem 源物品容器与客户端请求不匹配");
             return false;
         }
 
         // Check if what the client provides as its source slot number is actually what the server has as data for the item
         if (action != SwapAction.doEquipInEmptySlot && fromItem?.Slot != fromSlot)
         {
-            Logger.Error("SplitOrMoveItem Source Item slot did not match what the client asked");
+            Logger.Error("SplitOrMoveItem 源物品插槽与客户端请求不匹配");
             return false;
         }
 
         // Check if the amount we want to move is actually available from source
         if (action != SwapAction.doEquipInEmptySlot && count > fromItem?.Count)
         {
-            Logger.Error("SplitOrMoveItem Source Item has less item count than is requested to be moved");
+            Logger.Error("SplitOrMoveItem 源物品数量小于请求移动的数量");
             return false;
         }
 
@@ -381,21 +381,21 @@ public class Inventory
             // Check if target slot type is what the server has on data
             if (itemInTargetSlot.SlotType != toType)
             {
-                Logger.Error("SplitOrMoveItem Target Item Type does not match");
+                Logger.Error("SplitOrMoveItem 目标物品类型不匹配");
                 return false;
             }
 
             // Check if target slot number is what the server has on data
             if (itemInTargetSlot.Slot != toSlot)
             {
-                Logger.Error("SplitOrMoveItem Target Item Slot does not match");
+                Logger.Error("SplitOrMoveItem 目标物品插槽不匹配");
                 return false;
             }
 
             // Check if target slot has enough room left for this item
             if (action != SwapAction.doEquipInEmptySlot && itemInTargetSlot.TemplateId == fromItem?.TemplateId && itemInTargetSlot.Count + count > fromItem.Template.MaxCount && fromItem.Template.MaxCount > 1)
             {
-                Logger.Error("SplitOrMoveItem Target Item stack does not have enough room to take source");
+                Logger.Error("SplitOrMoveItem 目标物品堆叠没有足够空间容纳源物品");
                 return false;
             }
         }

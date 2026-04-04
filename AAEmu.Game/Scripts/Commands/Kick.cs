@@ -23,7 +23,7 @@ public class Kick : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Kicks target";
+        return "踢出目标";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -40,7 +40,7 @@ public class Kick : ICommand
 
         if (targetChar == null)
         {
-            CommandManager.SendNormalText(this, messageOutput, $"Target not found");
+            CommandManager.SendNormalText(this, messageOutput, $"未找到目标");
             return;
         }
 

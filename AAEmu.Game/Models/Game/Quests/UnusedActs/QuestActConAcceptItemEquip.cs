@@ -16,7 +16,7 @@ public class QuestActConAcceptItemEquip(QuestComponentTemplate parentComponent) 
 
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Error($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), ItemId {ItemId}");
+        Logger.Error($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，物品 ID {ItemId}");
         return quest.QuestAcceptorType == QuestAcceptorType.Item && quest.AcceptorId == ItemId;
     }
 }

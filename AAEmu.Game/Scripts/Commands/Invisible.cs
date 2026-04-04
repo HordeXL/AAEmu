@@ -21,7 +21,7 @@ public class Invisible : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Sets yourself as invisible to other players";
+        return "使自己对其他玩家隐身";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)

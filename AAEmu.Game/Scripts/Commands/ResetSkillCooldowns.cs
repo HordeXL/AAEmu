@@ -21,7 +21,7 @@ public class ResetSkillCooldowns : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Resets skill cooldowns.";
+        return "重置技能冷却时间。";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)

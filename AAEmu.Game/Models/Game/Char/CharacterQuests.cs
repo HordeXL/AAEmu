@@ -50,12 +50,12 @@ public class CharacterQuests(Character owner)
         {
             if (forcibly)
             {
-                Logger.Info($"[GM] quest {questId}, added!");
+                Logger.Info($"[GM] 任务 {questId}，已添加！");
                 DropQuest(questId, true);
             }
             else
             {
-                Logger.Info($"Duplicate quest {questId}, not added!");
+                Logger.Info($"重复任务 {questId}，未添加！");
                 return false;
             }
         }
@@ -63,7 +63,7 @@ public class CharacterQuests(Character owner)
         var template = QuestManager.Instance.GetTemplate(questId);
         if (template == null)
         {
-            Logger.Error($"Failed to start new Quest {questId}, invalid Id");
+            Logger.Error($"无法启动新任务 {questId}，ID 无效");
             return false;
         }
 
@@ -73,7 +73,7 @@ public class CharacterQuests(Character owner)
         {
             if (!UnitRequirementsGameData.Instance.CanComponentRun(questComponentTemplate, Owner))
             {
-                Logger.Trace($"User {Owner.Name} ({Owner.Id}) does not meet requirements to start new Quest {questId}, ComponentId {questComponentTemplate.Id}");
+                Logger.Trace($"用户 {Owner.Name} ({Owner.Id}) 不满足开始新任务 {questId} 的条件，ComponentId {questComponentTemplate.Id}");
                 if (!forcibly)
                     return false;
             }
@@ -83,12 +83,12 @@ public class CharacterQuests(Character owner)
         {
             if (forcibly)
             {
-                Logger.Info($"[GM] quest {questId}, added!");
+                Logger.Info($"[GM] 任务 {questId}，已添加！");
                 DropQuest(questId, true);
             }
             else if (template.Repeatable == false)
             {
-                Logger.Warn($"Quest {questId} already completed for {Owner.Name}, not added!");
+                Logger.Warn($"任务 {questId} 已被 {Owner.Name} 完成，未添加！");
                 Owner.SendErrorMessage(ErrorMessageType.QuestDailyLimit);
                 return false;
             }
@@ -224,8 +224,8 @@ public class CharacterQuests(Character owner)
             SetCompletedQuestFlag(questId, false);
         }
 
-        quest.Owner.SendDebugMessage($"[Quest] for player: {Owner.Name}, quest: {questId} removed.");
-        Logger.Warn($"[Quest] for player: {Owner.Name}, quest: {questId} removed.");
+        quest.Owner.SendDebugMessage($"[任务] 玩家：{Owner.Name}，任务：{questId} 已移除。");
+        Logger.Warn($"[任务] 玩家：{Owner.Name}，任务：{questId} 已移除。");
 
         QuestManager.Instance.RemoveQuestTimer(Owner.Id, questId);
 
@@ -453,7 +453,7 @@ public class CharacterQuests(Character owner)
                     if (q.DetailId == qd && completeBlock.Body[blockIndex])
                     {
                         completeBlock.Body.Set(blockIndex, false);
-                        Logger.Info($"QuestReset by {Owner.Name}, reset {questId}");
+                        Logger.Info($"任务重置由 {Owner.Name} 执行，重置 {questId}");
                         if (sendIfChanged)
                         {
                             var body = new byte[8];
@@ -504,7 +504,7 @@ public class CharacterQuests(Character owner)
                     var template = QuestManager.Instance.GetTemplate(templateId);
                     if (template == null)
                     {
-                        Logger.Error($"Quest {templateId} by {Owner.Name} does not exist");
+                        Logger.Error($"任务 {templateId} 由 {Owner.Name} 不存在");
                         continue;
                     }
 

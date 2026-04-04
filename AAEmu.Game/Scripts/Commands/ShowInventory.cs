@@ -27,7 +27,7 @@ public class ShowInventory : ICommand
     public string GetCommandHelpText()
     {
         return
-            "Show content of target's item container.\rEquipment = 1, Inventory = 2 (default), Bank = 3, Trade = 4, Mail = 5";
+            "显示目标物品容器的内容。\r\n装备 = 1, 背包 = 2 (默认), 银行 = 3, 交易 = 4, 邮件 = 5";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -77,7 +77,7 @@ public class ShowInventory : ICommand
                 }
                 else
                 {
-                    CommandManager.SendErrorText(this, messageOutput, $"Invalid ContainerType Id {argContainerId}");
+                    CommandManager.SendErrorText(this, messageOutput, $"无效的容器类型 ID {argContainerId}");
                     return;
                 }
             }

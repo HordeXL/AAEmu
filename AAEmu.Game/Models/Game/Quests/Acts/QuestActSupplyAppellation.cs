@@ -15,7 +15,7 @@ public class QuestActSupplyAppellation(QuestComponentTemplate parentComponent) :
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), AppellationId {AppellationId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，称号 ID {AppellationId}");
         quest.Owner.Appellations.Add(AppellationId);
         return true;
     }

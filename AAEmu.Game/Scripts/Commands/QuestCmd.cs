@@ -22,7 +22,7 @@ public class QuestCmd : ICommand
 
     public string GetCommandHelpText()
     {
-        return "[Quest] /quest <add||remove||list||prog||reward||resetdaily>";
+        return "[任务] /quest <add||remove||list||prog||reward||resetdaily>";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)

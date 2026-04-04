@@ -23,7 +23,7 @@ public class QuestActObjSphere(QuestComponentTemplate parentComponent) : QuestAc
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), SphereId {SphereId}, NpcId {NpcId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，球体 ID {SphereId}，NPC ID {NpcId}");
         return currentObjectiveCount > 0;
     }
 
@@ -48,7 +48,7 @@ public class QuestActObjSphere(QuestComponentTemplate parentComponent) : QuestAc
         if (questAct.Id != ActId || args.SphereQuest.ComponentId != questAct.QuestComponent.Template.Id)
             return;
 
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnEnterSphere: Quest: {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id}), ComponentId {args.SphereQuest.ComponentId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnEnterSphere: 任务：{questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})，组件 ID {args.SphereQuest.ComponentId}");
         SetObjective(questAct, 1);
     }
 
@@ -57,7 +57,7 @@ public class QuestActObjSphere(QuestComponentTemplate parentComponent) : QuestAc
         if (questAct.Id != ActId || args.SphereQuest.ComponentId != questAct.QuestComponent.Template.Id)
             return;
 
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnExitSphere: Quest: {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id}), ComponentId {args.SphereQuest.ComponentId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnExitSphere: 任务：{questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})，组件 ID {args.SphereQuest.ComponentId}");
         SetObjective(questAct, 0);
     }
 

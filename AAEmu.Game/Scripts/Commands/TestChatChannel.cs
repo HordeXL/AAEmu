@@ -24,15 +24,15 @@ public class TestChatChannel : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Command used to manually send join/leave channel packets to yourself used for testing\r" +
-               "You can also use list to show a list of all current chat channels, or clean to remove any non-system channel that has zero users in it.";
+        return "用于手动向自己发送加入/离开频道数据包的测试命令\r" +
+               "你也可以使用 list 显示所有当前聊天频道的列表，或使用 clean 移除任何没有用户的非系统频道。";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
     {
         if (args.Length == 1 && args[0].Equals("list", StringComparison.CurrentCultureIgnoreCase))
         {
-            CommandManager.SendNormalText(this, messageOutput, $"List all channels");
+            CommandManager.SendNormalText(this, messageOutput, $"列出所有频道");
             var channels = ChatManager.Instance.ListAllChannels();
             foreach (var c in channels)
             {
@@ -40,14 +40,14 @@ public class TestChatChannel : ICommand
                     $"T:{c.ChatType} ST:{c.SubType} F:{c.Faction} => {c.InternalId} - {c.InternalName} ({c.Members.Count})");
             }
 
-            CommandManager.SendNormalText(this, messageOutput, $"End of list");
+            CommandManager.SendNormalText(this, messageOutput, $"列表结束");
             return;
         }
 
         if (args.Length == 1 && args[0].Equals("clean", StringComparison.CurrentCultureIgnoreCase))
         {
             var removed = ChatManager.Instance.CleanUpChannels();
-            CommandManager.SendNormalText(this, messageOutput, $"{removed} empty channel(s) removed");
+            CommandManager.SendNormalText(this, messageOutput, $"已移除 {removed} 个空频道");
             return;
         }
 
@@ -62,7 +62,7 @@ public class TestChatChannel : ICommand
             !Enum.TryParse<FactionsEnum>(args[1], true, out var chatFaction)
            )
         {
-            CommandManager.SendErrorText(this, messageOutput, $"Parse error");
+            CommandManager.SendErrorText(this, messageOutput, $"解析错误");
             return;
         }
 

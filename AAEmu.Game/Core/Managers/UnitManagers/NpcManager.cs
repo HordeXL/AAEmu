@@ -135,6 +135,7 @@ public class NpcManager(IObjectIdManager objectIdManager, IModelManager modelMan
             CanFly = modelManager.IsFlyOrSwim(template.ModelId),
             Faction = factionManager.GetFaction(template.FactionId),
             Level = template.Level,
+            Name = LocalizationManager.Instance.Get("npcs", "name", template.Id, template.Name), // Use localized name
             Patrol = null
         };
 

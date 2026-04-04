@@ -304,136 +304,136 @@ public static class SkillResultHelper
         {
             case "": return SkillResult.Success;
             case "skill_success": return SkillResult.Success;
-            case "skill_failure": return (SkillResult)1; //	Can't use this.
-            case "skill_source_died": return (SkillResult)2; //	Can't be used while dead.
-            case "skill_source_alive": return (SkillResult)3; //	Can only be used while dead.
-            case "skill_target_died": return (SkillResult)4; //	Can't be used on a dead target.
-            case "skill_target_destroyed": return (SkillResult)5; //	Target is already destroyed.
-            case "skill_target_alive": return (SkillResult)6; //	Can't be used on a living target.
-            case "skill_on_casting": return (SkillResult)7; //	Already performing an action.
-            case "skill_cooldown_time": return (SkillResult)8; //	Can't be used right now.
-            case "skill_no_target": return (SkillResult)9; //	Select a target.
-            case "skill_lack_health": return (SkillResult)10; //	Insufficient health to use this.
-            case "skill_lack_mana": return (SkillResult)11; //	Insufficient mana to use this.
-            case "skill_obstacle": return (SkillResult)12; //	No line of sight.
-            case "skill_outof_height": return (SkillResult)13; //	Target is on a different elevation.
-            case "skill_too_close_range": return (SkillResult)14; //	Target is too close.
-            case "skill_too_far_range": return (SkillResult)15; //	Target is too far.
-            case "skill_outof_angle": return (SkillResult)16; //	Invalid target direction.
-            case "skill_cannot_cast_in_combat": return (SkillResult)17; //	Can't be used in combat.
-            case "skill_cannot_cast_while_moving": return (SkillResult)18; //	Can't be used while moving.
-            case "skill_cannot_cast_in_stun": return (SkillResult)19; //	Can't be used while stunned.
-            case "skill_cannot_cast_while_walking": return (SkillResult)20; //	Can't use while walking.
-            case "skill_cannot_cast_in_swimming": return (SkillResult)21; //	Can't use this while swimming.
-            case "skill_blank_minded": return (SkillResult)22; //	Can't use in ($1) unknown.
-            case "skill_silence": return (SkillResult)23; //	Can't use magic skills while silenced.
-            case "skill_crippled": return (SkillResult)24; //	Can't use physical skills while restrained.
-            case "skill_cannot_cast_in_channeling": return (SkillResult)25; //	Can't use while busy.
-            case "skill_cannot_cast_in_prison": return (SkillResult)26; //	Stay away from trouble while imprisoned.
-            case "skill_need_stealth": return (SkillResult)27; //	Can only use while hidden.
-            case "skill_need_nocombat_target": return (SkillResult)28; //	Target is in combat.
-            case "skill_target_immune": return (SkillResult)29; //	Target is immune.
-            case "skill_invalid_skill": return (SkillResult)30; //	Can't use this skill.
-            case "skill_inactive_ability": return (SkillResult)31; //	Can't use this ability.
-            case "skill_not_enough_ability_level": return (SkillResult)32; //	Insufficient skill level.
-            case "skill_invalid_source": return (SkillResult)33; //	Can't be used in this state.
-            case "skill_invalid_target": return (SkillResult)34; //	Invalid target.
-            case "skill_invalid_location": return (SkillResult)35; //	Can't be used here.
-            case "skill_need_reagent": return (SkillResult)36; //	Not enough ($1) unknown.
-            case "skill_item_locked": return (SkillResult)37; //	Can't use this item.
-            case "skill_need_money": return (SkillResult)38; //	Insufficient coins.
-            case "skill_need_labor_power": return (SkillResult)39; //	Insufficient Labor Points.
-            case "skill_source_is_hanging": return (SkillResult)40; //	Can't be used while airborne.
-            case "skill_source_is_riding": return (SkillResult)41; //	Can't be used while riding.
-            case "skill_higher_buff": return (SkillResult)42; //	Can't be used while a stronger effect is active.
-            case "skill_not_pvp_area": return (SkillResult)43; //	PvP is not allowed in sanctuary zones.
-            case "skill_not_now": return (SkillResult)44; //	Can't be used right now.
-            case "skill_no_perm": return (SkillResult)45; //	You don't have permission.
-            case "skill_bag_full": return (SkillResult)46; //	Your bag is full.
-            case "skill_protected_faction": return (SkillResult)47; //	Can't instigate a raid against the ($1) unknown faction in this area.
-            case "skill_protected_level": return (SkillResult)48; //	Can't start battles with characters Lv10 and below in protected zones.
-            case "skill_unit_reqs_or_fail": return (SkillResult)49; //	Fails the requirements.
-            // case "": return (SkillResult)50; //	unknown
-            case "backpack_occupied": return (SkillResult)51; //	Already carrying a pack.
-            case "skill_obstacle_for_spawn_doodad": return (SkillResult)52; //	Blocked by an obstacle.
-            case "skill_cannot_spawn_doodad_in_house": return (SkillResult)53; //	Can't place that here.
-            case "skill_cannot_use_for_self": return (SkillResult)54; //	Can't use on yourself.
-            case "skill_not_preoccupied": return (SkillResult)55; //	Can only be used on selected targets.
-            case "skill_not_my_npc": return (SkillResult)56; //	You don't have permission.
-            case "skill_not_checked_second_pass": return (SkillResult)57; //	Failed to pass the second password.
-            case "SKILL_CANNOT_USE_HERE": return (SkillResult)58; //	Can't use this skill in this location.
-            case "skill_invalid_grade_enchant_support_item": return (SkillResult)59; //	Can't use a Regrade Charm.
-            case "skill_check_character_p_stat_min": return (SkillResult)60; //	You can downgrade this stat to ($1) unknown.
-            case "skill_check_character_p_stat_max": return (SkillResult)61; //	You can upgrade this stat to ($1) unknown.
-            case "skill_item_secured": return (SkillResult)62; //	89 ?? skill_item_secured
-            case "skill_invalid_account_attribute": return (SkillResult)63; //	Your account doesn't have the required permissions.
-            case "skill_urk_level": return (SkillResult)64; //	Your level is too low.
-            case "skill_urk_ability": return (SkillResult)65; //	Your stats are too low.
-            case "skill_urk_race": return (SkillResult)66; //	Does not apply to this race.
-            case "skill_urk_gender": return (SkillResult)67; //	Does not apply to this gender.
-            case "skill_urk_equip_slot": return (SkillResult)68; //	Must be equipped with the proper gear.
-            case "skill_urk_equip_item": return (SkillResult)69; //	Must be equipped with an item.
-            case "skill_urk_own_item": return (SkillResult)70; //	You need ($1) unknown(|r.)
-            case "skill_urk_trained_skill": return (SkillResult)71; //	You haven't learned this skill yet.
-            case "skill_urk_combat": return (SkillResult)72; //	Can't be used in combat.
-            case "skill_urk_stealth": return (SkillResult)73; //	Stealth status does not meet the requirements.
-            case "skill_urk_health": return (SkillResult)74; //	Health does not meet the requirements.
-            case "skill_urk_buff": return (SkillResult)75; //	Must be ($1) unknown.
-            case "skill_urk_target_buff": return (SkillResult)76; //	Target must be ($1) unknown.
-            case "skill_urk_target_combat": return (SkillResult)77; //	Target's combat status does not meet the requirements.
-            case "skill_urk_can_learn_craft": return (SkillResult)78; //	You already learned this crafting skill.
-            case "skill_urk_doodad_range": return (SkillResult)79; //	$1 is not in your immediate surroundings.
-            case "skill_urk_equip_shield": return (SkillResult)80; //	Must be equipped with a shield.
-            case "skill_urk_nobuff": return (SkillResult)81; //	Must not be under the effect of ($1) unknown.
-            case "skill_urk_target_buff_tag": return (SkillResult)82; //	Target must be ($1) unknown.
-            case "skill_urk_corpse_range": return (SkillResult)83; //	No corpses nearby.
-            case "skill_urk_equip_weapon_type": return (SkillResult)84; //	Must be equipped with the correct weapon.
-            case "skill_urk_target_health_less_than": return (SkillResult)85; //	Target's health must be low.
-            case "skill_urk_target_npc": return (SkillResult)86; //	Can only be used on ($1) unknown.
-            case "skill_urk_target_doodad": return (SkillResult)87; //	Invalid object.
-            case "skill_urk_equip_ranged": return (SkillResult)88; //	Must be equipped with a ranged weapon.
-            case "skill_urk_no_buff_tag": return (SkillResult)89; //	Can't do this now.
-            case "skill_urk_complete_quest_context": return (SkillResult)90; //	Quest: $1 must be completed.
-            case "skill_urk_progress_quest_context": return (SkillResult)91; //	Quest: $1 must be in-progress.
-            case "skill_urk_ready_quest_context": return (SkillResult)92; //	Quest: $1 must be completed.
-            case "skill_urk_target_npc_group": return (SkillResult)93; //	Invalid target.
-            case "skill_urk_area_sphere": return (SkillResult)94; //	Can't be used here.
-            case "skill_urk_except_complete_quest_context": return (SkillResult)95; //	89 ?? Skill_urk_except_complete_quest_context
-            case "skill_urk_precomplete_quest_context": return (SkillResult)96; //	Quest: $1 must be in-progress.
-            case "skill_urk_target_owner_type": return (SkillResult)97; //	Invalid target.
-            case "skill_urk_not_under_water": return (SkillResult)98; //	Can't use underwater.
-            case "skill_urk_faction_match": return (SkillResult)99; //	You are not a member of the $1 faction.
-            case "skill_urk_tod": return (SkillResult)100; //	Can't be used at this time.
-            case "skill_urk_mother_faction": return (SkillResult)101; //	Your faction can't use this.
-            case "skill_urk_actability_point": return (SkillResult)102; //	Insufficient $1 proficiency.
-            case "skill_urk_crime_point": return (SkillResult)103; //	89 ?? Skill_urk_crime_point
-            case "skill_urk_honor_point": return (SkillResult)104; //	You don't meet the Honor Point requirements.
-            case "skill_urk_living_point": return (SkillResult)105; //	You don't meet the Vocation Badge requirements.
-            case "skill_urk_crime_record": return (SkillResult)106; //	89 ?? Skill_urk_crime_record
-            case "skill_urk_jury_point": return (SkillResult)107; //	89 ?? Skill_urk_jury_point
-            case "skill_urk_source_owner_type": return (SkillResult)108; //	89 ?? Skill_urk_source_owner_type
-            case "skill_urk_appelation": return (SkillResult)109; //	89 ?? Skill_urk_appelation
-            case "skill_urk_in_zone": return (SkillResult)110; //	Can only be used in $1.
-            case "skill_urk_out_zone": return (SkillResult)111; //	Can't be used in $1.
-            case "skill_urk_dominion_owner": return (SkillResult)112; //	Only Lords can do this.
-            case "skill_urk_verdict_only": return (SkillResult)113; //	Your jury privileges have been revoked. You can no longer serve on juries.
-            case "skill_urk_faction_match_only": return (SkillResult)114; //	You are not a member of the $1 faction.
-            case "skill_urk_mother_faction_only": return (SkillResult)115; //	Your faction can't use this.
-            case "skill_urk_nation_owner": return (SkillResult)116; //	89 ?? Skill_urk_nation_owner
-            case "skill_urk_faction_match_only_not": return (SkillResult)117; //	$1+ HP must be drained first. // This translation seems wrong
-            case "skill_urk_mother_faction_only_not": return (SkillResult)118; //	The $1 sub faction can't do this.
-            case "skill_urk_nation_member": return (SkillResult)119; //	You must be in a nation.
-            case "skill_urk_nation_member_not": return (SkillResult)120; //	You can't be in a nation to do this.
-            case "skill_urk_nation_owner_at_pos": return (SkillResult)121; //	89 ?? Skill_urk_nation_owner_at_pos
-            case "skill_urk_dominion_owner_at_pos": return (SkillResult)122; //	89 ?? Skill_urk_dominion_owner_at_pos
-            case "skill_urk_housing": return (SkillResult)123; //	You do not have $1.
-            case "skill_urk_health_margin": return (SkillResult)124; //	89 ?? Skill_urk_health_margin
-            case "skill_urk_mana_margin": return (SkillResult)125; //	$1+ MP must be drained first.
-            case "skill_urk_labor_power_margin": return (SkillResult)126; //	$1+ Labor must be drained first.
-            case "skill_urk_unknown": return (SkillResult)127; //	Can't use this.
-            case "skill_urk_max_level": return (SkillResult)128; //	Your level is too high.
-            case "skill_urk_expedition_owner": return (SkillResult)129; //	89 ?? Skill_urk_expedition_owner
-            case "skill_urk_expedition_member": return (SkillResult)130; //	89 ?? Skill_urk_expedition_member
+            case "skill_failure": return (SkillResult)1; // 无法使用此技能。
+            case "skill_source_died": return (SkillResult)2; // 死亡状态下无法使用。
+            case "skill_source_alive": return (SkillResult)3; // 只能在死亡状态下使用。
+            case "skill_target_died": return (SkillResult)4; // 无法对死亡目标使用。
+            case "skill_target_destroyed": return (SkillResult)5; // 目标已被摧毁。
+            case "skill_target_alive": return (SkillResult)6; // 无法对存活目标使用。
+            case "skill_on_casting": return (SkillResult)7; // 已经在执行动作。
+            case "skill_cooldown_time": return (SkillResult)8; // 当前无法使用。
+            case "skill_no_target": return (SkillResult)9; // 请选择一个目标。
+            case "skill_lack_health": return (SkillResult)10; // 生命值不足以使用此技能。
+            case "skill_lack_mana": return (SkillResult)11; // 魔法值不足以使用此技能。
+            case "skill_obstacle": return (SkillResult)12; // 没有视线。
+            case "skill_outof_height": return (SkillResult)13; // 目标在不同的高度。
+            case "skill_too_close_range": return (SkillResult)14; // 目标太近。
+            case "skill_too_far_range": return (SkillResult)15; // 目标太远。
+            case "skill_outof_angle": return (SkillResult)16; // 目标方向无效。
+            case "skill_cannot_cast_in_combat": return (SkillResult)17; // 战斗中无法使用。
+            case "skill_cannot_cast_while_moving": return (SkillResult)18; // 移动中无法使用。
+            case "skill_cannot_cast_in_stun": return (SkillResult)19; // 眩晕状态下无法使用。
+            case "skill_cannot_cast_while_walking": return (SkillResult)20; // 行走时无法使用。
+            case "skill_cannot_cast_in_swimming": return (SkillResult)21; // 游泳时无法使用。
+            case "skill_blank_minded": return (SkillResult)22; // 无法在 ($1) 未知状态下使用。
+            case "skill_silence": return (SkillResult)23; // 沉默状态下无法使用魔法技能。
+            case "skill_crippled": return (SkillResult)24; // 束缚状态下无法使用物理技能。
+            case "skill_cannot_cast_in_channeling": return (SkillResult)25; // 忙碌时无法使用。
+            case "skill_cannot_cast_in_prison": return (SkillResult)26; // 监禁期间请远离麻烦。
+            case "skill_need_stealth": return (SkillResult)27; // 只能在隐身状态下使用。
+            case "skill_need_nocombat_target": return (SkillResult)28; // 目标正在战斗。
+            case "skill_target_immune": return (SkillResult)29; // 目标免疫。
+            case "skill_invalid_skill": return (SkillResult)30; // 无法使用此技能。
+            case "skill_inactive_ability": return (SkillResult)31; // 无法使用此能力。
+            case "skill_not_enough_ability_level": return (SkillResult)32; // 技能等级不足。
+            case "skill_invalid_source": return (SkillResult)33; // 无法在此状态下使用。
+            case "skill_invalid_target": return (SkillResult)34; // 目标无效。
+            case "skill_invalid_location": return (SkillResult)35; // 无法在这里使用。
+            case "skill_need_reagent": return (SkillResult)36; // 物品不足 ($1) 未知。
+            case "skill_item_locked": return (SkillResult)37; // 无法使用此物品。
+            case "skill_need_money": return (SkillResult)38; // 金币不足。
+            case "skill_need_labor_power": return (SkillResult)39; // 劳动力不足。
+            case "skill_source_is_hanging": return (SkillResult)40; // 空中状态下无法使用。
+            case "skill_source_is_riding": return (SkillResult)41; // 骑行状态下无法使用。
+            case "skill_higher_buff": return (SkillResult)42; // 已有更强的效果激活时无法使用。
+            case "skill_not_pvp_area": return (SkillResult)43; // 避难所区域不允许 PvP。
+            case "skill_not_now": return (SkillResult)44; // 当前无法使用。
+            case "skill_no_perm": return (SkillResult)45; // 你没有权限。
+            case "skill_bag_full": return (SkillResult)46; // 背包已满。
+            case "skill_protected_faction": return (SkillResult)47; // 无法在此区域对 ($1) 未知阵营发起突袭。
+            case "skill_protected_level": return (SkillResult)48; // 保护区域内无法与 10 级及以下角色战斗。
+            case "skill_unit_reqs_or_fail": return (SkillResult)49; // 不符合要求。
+            // case "": return (SkillResult)50; // 未知
+            case "backpack_occupied": return (SkillResult)51; // 已经携带着背包。
+            case "skill_obstacle_for_spawn_doodad": return (SkillResult)52; // 被障碍物阻挡。
+            case "skill_cannot_spawn_doodad_in_house": return (SkillResult)53; // 无法在这里放置。
+            case "skill_cannot_use_for_self": return (SkillResult)54; // 无法对自己使用。
+            case "skill_not_preoccupied": return (SkillResult)55; // 只能对选中的目标使用。
+            case "skill_not_my_npc": return (SkillResult)56; // 你没有权限。
+            case "skill_not_checked_second_pass": return (SkillResult)57; // 未通过二级密码验证。
+            case "SKILL_CANNOT_USE_HERE": return (SkillResult)58; // 无法在此位置使用此技能。
+            case "skill_invalid_grade_enchant_support_item": return (SkillResult)59; // 无法使用重铸符。
+            case "skill_check_character_p_stat_min": return (SkillResult)60; // 你可以将此属性降级到 ($1) 未知。
+            case "skill_check_character_p_stat_max": return (SkillResult)61; // 你可以将此属性升级到 ($1) 未知。
+            case "skill_item_secured": return (SkillResult)62; // 89 ?? skill_item_secured
+            case "skill_invalid_account_attribute": return (SkillResult)63; // 你的账户没有所需的权限。
+            case "skill_urk_level": return (SkillResult)64; // 你的等级太低。
+            case "skill_urk_ability": return (SkillResult)65; // 你的属性太低。
+            case "skill_urk_race": return (SkillResult)66; // 不适用于此种族。
+            case "skill_urk_gender": return (SkillResult)67; // 不适用于此性别。
+            case "skill_urk_equip_slot": return (SkillResult)68; // 必须装备正确的装备。
+            case "skill_urk_equip_item": return (SkillResult)69; // 必须装备物品。
+            case "skill_urk_own_item": return (SkillResult)70; // 你需要 ($1) 未知(|r。)
+            case "skill_urk_trained_skill": return (SkillResult)71; // 你还没有学习此技能。
+            case "skill_urk_combat": return (SkillResult)72; // 战斗中无法使用。
+            case "skill_urk_stealth": return (SkillResult)73; // 隐身状态不符合要求。
+            case "skill_urk_health": return (SkillResult)74; // 生命值不符合要求。
+            case "skill_urk_buff": return (SkillResult)75; // 必须是 ($1) 未知状态。
+            case "skill_urk_target_buff": return (SkillResult)76; // 目标必须是 ($1) 未知状态。
+            case "skill_urk_target_combat": return (SkillResult)77; // 目标的战斗状态不符合要求。
+            case "skill_urk_can_learn_craft": return (SkillResult)78; // 你已经学习了此制作技能。
+            case "skill_urk_doodad_range": return (SkillResult)79; // $1 不在你周围。
+            case "skill_urk_equip_shield": return (SkillResult)80; // 必须装备盾牌。
+            case "skill_urk_nobuff": return (SkillResult)81; // 不能处于 ($1) 未知效果下。
+            case "skill_urk_target_buff_tag": return (SkillResult)82; // 目标必须是 ($1) 未知状态。
+            case "skill_urk_corpse_range": return (SkillResult)83; // 附近没有尸体。
+            case "skill_urk_equip_weapon_type": return (SkillResult)84; // 必须装备正确的武器。
+            case "skill_urk_target_health_less_than": return (SkillResult)85; // 目标的生命值必须较低。
+            case "skill_urk_target_npc": return (SkillResult)86; // 只能对 ($1) 未知使用。
+            case "skill_urk_target_doodad": return (SkillResult)87; // 对象无效。
+            case "skill_urk_equip_ranged": return (SkillResult)88; // 必须装备远程武器。
+            case "skill_urk_no_buff_tag": return (SkillResult)89; // 当前无法执行。
+            case "skill_urk_complete_quest_context": return (SkillResult)90; // 任务：$1 必须已完成。
+            case "skill_urk_progress_quest_context": return (SkillResult)91; // 任务：$1 必须进行中。
+            case "skill_urk_ready_quest_context": return (SkillResult)92; // 任务：$1 必须已完成。
+            case "skill_urk_target_npc_group": return (SkillResult)93; // 目标无效。
+            case "skill_urk_area_sphere": return (SkillResult)94; // 无法在这里使用。
+            case "skill_urk_except_complete_quest_context": return (SkillResult)95; // 89 ?? Skill_urk_except_complete_quest_context
+            case "skill_urk_precomplete_quest_context": return (SkillResult)96; // 任务：$1 必须进行中。
+            case "skill_urk_target_owner_type": return (SkillResult)97; // 目标无效。
+            case "skill_urk_not_under_water": return (SkillResult)98; // 水下无法使用。
+            case "skill_urk_faction_match": return (SkillResult)99; // 你不是 $1 阵营的成员。
+            case "skill_urk_tod": return (SkillResult)100; // 当前无法使用。
+            case "skill_urk_mother_faction": return (SkillResult)101; // 你的阵营无法使用此功能。
+            case "skill_urk_actability_point": return (SkillResult)102; // $1 熟练度不足。
+            case "skill_urk_crime_point": return (SkillResult)103; // 89 ?? Skill_urk_crime_point
+            case "skill_urk_honor_point": return (SkillResult)104; // 荣誉点数不符合要求。
+            case "skill_urk_living_point": return (SkillResult)105; // 职业徽章不符合要求。
+            case "skill_urk_crime_record": return (SkillResult)106; // 89 ?? Skill_urk_crime_record
+            case "skill_urk_jury_point": return (SkillResult)107; // 89 ?? Skill_urk_jury_point
+            case "skill_urk_source_owner_type": return (SkillResult)108; // 89 ?? Skill_urk_source_owner_type
+            case "skill_urk_appelation": return (SkillResult)109; // 89 ?? Skill_urk_appelation
+            case "skill_urk_in_zone": return (SkillResult)110; // 只能在 $1 中使用。
+            case "skill_urk_out_zone": return (SkillResult)111; // 无法在 $1 中使用。
+            case "skill_urk_dominion_owner": return (SkillResult)112; // 只有领主可以执行此操作。
+            case "skill_urk_verdict_only": return (SkillResult)113; // 你的陪审团权限已被撤销。你不能再担任陪审员。
+            case "skill_urk_faction_match_only": return (SkillResult)114; // 你不是 $1 阵营的成员。
+            case "skill_urk_mother_faction_only": return (SkillResult)115; // 你的阵营无法使用此功能。
+            case "skill_urk_nation_owner": return (SkillResult)116; // 89 ?? Skill_urk_nation_owner
+            case "skill_urk_faction_match_only_not": return (SkillResult)117; // 必须先消耗 $1+ 生命值。// 这个翻译似乎不对
+            case "skill_urk_mother_faction_only_not": return (SkillResult)118; // $1 子阵营无法执行此操作。
+            case "skill_urk_nation_member": return (SkillResult)119; // 你必须加入一个民族。
+            case "skill_urk_nation_member_not": return (SkillResult)120; // 你不能加入民族来执行此操作。
+            case "skill_urk_nation_owner_at_pos": return (SkillResult)121; // 89 ?? Skill_urk_nation_owner_at_pos
+            case "skill_urk_dominion_owner_at_pos": return (SkillResult)122; // 89 ?? Skill_urk_dominion_owner_at_pos
+            case "skill_urk_housing": return (SkillResult)123; // 你没有 $1。
+            case "skill_urk_health_margin": return (SkillResult)124; // 89 ?? Skill_urk_health_margin
+            case "skill_urk_mana_margin": return (SkillResult)125; // 必须先消耗 $1+ 魔法值。
+            case "skill_urk_labor_power_margin": return (SkillResult)126; // 必须先消耗 $1+ 劳动力。
+            case "skill_urk_unknown": return (SkillResult)127; // 无法使用。
+            case "skill_urk_max_level": return (SkillResult)128; // 你的等级太高。
+            case "skill_urk_expedition_owner": return (SkillResult)129; // 89 ?? Skill_urk_expedition_owner
+            case "skill_urk_expedition_member": return (SkillResult)130; // 89 ?? Skill_urk_expedition_member
             // case "skill_urk_progress_quest_context": return (SkillResult)131; //	89 ?? Skill_urk_progress_quest_context
             // case "skill_urk_ready_quest_context": return (SkillResult)132; //	89 ?? Skill_urk_ready_quest_context
             default: return SkillResult.Failure;

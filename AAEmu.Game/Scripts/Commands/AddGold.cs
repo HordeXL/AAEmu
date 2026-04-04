@@ -24,7 +24,7 @@ public class AddGold : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Adds X amount of money to target (can be negative values).";
+        return "为目标添加 X 数量的金钱（可以是负值）。";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -66,13 +66,13 @@ public class AddGold : ICommand
             if (character.Id != targetPlayer.Id)
             {
                 CommandManager.SendNormalText(this, messageOutput,
-                    $"changed {targetPlayer.Name}'s money by {argGold}g {argSilver}s {argCopper}c");
-                targetPlayer.SendMessage($"[GM] {character.Name} has adjusted your money");
+                    $"已更改 {targetPlayer.Name} 的金钱 {argGold}金 {argSilver}银 {argCopper}铜");
+                targetPlayer.SendMessage($"[GM] {character.Name} 已调整你的金钱");
             }
         }
         else
         {
-            CommandManager.SendErrorText(this, messageOutput, "No valid amount provided ...");
+            CommandManager.SendErrorText(this, messageOutput, "未提供有效的数量 ...");
         }
     }
 }

@@ -181,7 +181,7 @@ public class LootingContainer(IBaseUnit owner)
                 // If no eligible players defined, then try to use the killer's loot rates and mark it as the sole valid option
                 lootDropRate *= (100f + player.DropRateMul) / 100f;
                 lootGoldRate *= (100f + player.LootGoldMul) / 100f;
-                Logger.Info($"Unit killed without aggro: {npc.ObjId} ({npc.TemplateId}) by {player.Name}");
+                Logger.Info($"单位被击杀没有仇恨：{npc.ObjId} ({npc.TemplateId}) 被 {player.Name}");
                 EligiblePlayers.Add(player);
             }
 
@@ -228,12 +228,12 @@ public class LootingContainer(IBaseUnit owner)
         if (LootOwnerType == LootOwnerType.Doodad && LootOwner is Doodad doodad)
         {
             // TODO: LootOwnerType.Doodad
-            Logger.Warn($"Not yet implemented for doodads, LootOwner: {LootOwnerType}:{doodad.ObjId}");
+            Logger.Warn($"尚未为建筑物实现，LootOwner: {LootOwnerType}:{doodad.ObjId}");
         }
         else
         {
             // TODO: Either loot generated for a not supported type or it no longer exists 
-            Logger.Warn($"Unsupported LootOwner: {LootOwnerType}:{LootOwner.ObjId}");
+            Logger.Warn($"不支持的 LootOwner: {LootOwnerType}:{LootOwner.ObjId}");
         }
     }
 
@@ -297,7 +297,7 @@ public class LootingContainer(IBaseUnit owner)
                     }
                     break;
                 default:
-                    Logger.Warn($"UpdateLootState, Unsupported LootOwnerType: {LootOwnerType} after looting");
+                        Logger.Warn($"UpdateLootState，不支持的 LootOwnerType: {LootOwnerType} 拾取后");
                     break;
             }
         }
@@ -427,7 +427,7 @@ public class LootingContainer(IBaseUnit owner)
                 }
                 else
                 {
-                    Logger.Warn($"TryTakeLoot, We have no valid Team to apply {TeamLootingRule.LootMethod} to. Reverting it to public as a failsafe");
+                    Logger.Warn($"TryTakeLoot，我们没有有效的团队来应用 {TeamLootingRule.LootMethod}。回退到公共作为备用");
                     allowLootingNow = true;
                     rollMandatory = false;
                     TeamLootingRule.LootMethod = LootingRuleMethod.Public;
@@ -592,12 +592,12 @@ public class LootingContainer(IBaseUnit owner)
                 }
                 else
                 {
-                    Logger.Trace("AutoEquipTradePack: Tradepack item added to Equipment container successfully.");
+                    Logger.Trace("AutoEquipTradePack: 贸易包物品成功添加到装备容器。");
                 }
             }
             else
             {
-                Logger.Warn("AutoEquipTradePack: Failed to take off backpack for auto-equip tradepack item TemplateId={0}.", itemEntry.Item.TemplateId);
+                Logger.Warn($"AutoEquipTradePack: 自动装备贸易包物品 TemplateId={0} 时移除背包失败。", itemEntry.Item.TemplateId);
                 player.SendPacket(new SCLootItemFailedPacket(ErrorMessageType.BagFull, LootOwnerType, LootOwner.ObjId, itemEntry.ItemIndex, itemEntry.Item.TemplateId));
                 return false;
             }

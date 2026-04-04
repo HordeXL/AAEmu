@@ -25,7 +25,7 @@ public class QuestActObjTalk(QuestComponentTemplate parentComponent) : QuestActT
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), NpcId {NpcId}, TeamShare {TeamShare}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，NPC ID {NpcId}，团队共享 {TeamShare}");
         return currentObjectiveCount > 0;
     }
 
@@ -47,7 +47,7 @@ public class QuestActObjTalk(QuestComponentTemplate parentComponent) : QuestActT
             return;
 
         var player = questAct.QuestComponent.Parent.Parent.Owner;
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnTalkMade: Quest: {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {player.Name} ({player.Id}), NpcId {args.NpcId}, Source {args.SourcePlayer.Name} ({args.SourcePlayer.Id})");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnTalkMade: 任务：{questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {player.Name} ({player.Id})，NPC ID {args.NpcId}，来源 {args.SourcePlayer.Name} ({args.SourcePlayer.Id})");
         SetObjective(questAct, 1);
 
         if (player.Id == args.SourcePlayer.Id)

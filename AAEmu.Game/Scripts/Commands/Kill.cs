@@ -24,7 +24,7 @@ public class Kill : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Kills target";
+        return "杀死目标";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -36,7 +36,7 @@ public class Kill : ICommand
             // Player is trying to kill an NPC/Monster
             if (aUnit.Hp == 0)
             {
-                CommandManager.SendErrorText(this, messageOutput, "Target is already dead");
+                CommandManager.SendErrorText(this, messageOutput, "目标已经死亡");
             }
             else
             {
@@ -51,7 +51,7 @@ public class Kill : ICommand
         }
         else
         {
-            CommandManager.SendNormalText(this, messageOutput, $"Cannot kill this target");
+            CommandManager.SendNormalText(this, messageOutput, $"无法杀死此目标");
         }
 
         character.IsInBattle = false; // In case the character gets stuck in battle mode after engaging a mob

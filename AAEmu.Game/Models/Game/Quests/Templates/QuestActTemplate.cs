@@ -58,7 +58,7 @@ public class QuestActTemplate(QuestComponentTemplate parentComponent)
     /// </summary>
     public virtual void InitializeAction(Quest quest, QuestAct questAct)
     {
-        Logger.Info($"{QuestActTemplateName}.InitializeAction({questAct.Template.DetailId}) Owner {quest.Owner.Name} ({quest.Owner.Id})");
+        Logger.Info($"{QuestActTemplateName}.InitializeAction({questAct.Template.DetailId}) 所有者 {quest.Owner.Name} ({quest.Owner.Id})");
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class QuestActTemplate(QuestComponentTemplate parentComponent)
     /// </summary>
     public virtual void FinalizeAction(Quest quest, QuestAct questAct)
     {
-        Logger.Info($"{QuestActTemplateName}.FinalizeAction({questAct.Template.DetailId}) Owner {quest.Owner.Name} ({quest.Owner.Id})");
+        Logger.Info($"{QuestActTemplateName}.FinalizeAction({questAct.Template.DetailId}) 所有者 {quest.Owner.Name} ({quest.Owner.Id})");
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class QuestActTemplate(QuestComponentTemplate parentComponent)
     /// </summary>
     public virtual void InitializeQuest(Quest quest, QuestAct questAct)
     {
-        Logger.Info($"{QuestActTemplateName}.InitializeQuest({questAct.Template.DetailId}) Owner {quest.Owner.Name} ({quest.Owner.Id})");
+        Logger.Info($"{QuestActTemplateName}.InitializeQuest({questAct.Template.DetailId}) 所有者 {quest.Owner.Name} ({quest.Owner.Id})");
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ public class QuestActTemplate(QuestComponentTemplate parentComponent)
     /// </summary>
     public virtual void FinalizeQuest(Quest quest, QuestAct questAct)
     {
-        Logger.Info($"{QuestActTemplateName}.FinalizeQuest({questAct.Template.DetailId}) Owner {quest.Owner.Name} ({quest.Owner.Id})");
+        Logger.Info($"{QuestActTemplateName}.FinalizeQuest({questAct.Template.DetailId}) 所有者 {quest.Owner.Name} ({quest.Owner.Id})");
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ public class QuestActTemplate(QuestComponentTemplate parentComponent)
     /// <returns>True if executed correctly, or objectives have been met</returns>
     public virtual bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Error($"{QuestActTemplateName}({DetailId}).RunAct, Quest {quest.TemplateId}, Owner: {quest.Owner.Name}, not implemented!");
+        Logger.Error($"{QuestActTemplateName}({DetailId}).RunAct，任务 {quest.TemplateId}，所有者：{quest.Owner.Name}，未实现！");
         return false;
     }
 

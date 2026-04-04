@@ -32,17 +32,17 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     /// </summary>
     public void Initialize()
     {
-        Logger.Info("Initializing Chat Manager...");
+        Logger.Info("正在初始化聊天管理器...");
 
         // Create Faction Channels
-        _ = AddFactionChannel(FactionsEnum.NuiaAlliance, "Nuia");
-        _ = AddFactionChannel(FactionsEnum.HaranyaAlliance, "Haranya");
-        _ = AddFactionChannel(FactionsEnum.Pirate, "Pirate");
+        _ = AddFactionChannel(FactionsEnum.NuiaAlliance, "努伊联盟");
+        _ = AddFactionChannel(FactionsEnum.HaranyaAlliance, "哈拉纳联盟");
+        _ = AddFactionChannel(FactionsEnum.Pirate, "海盗");
         // TODO: Player Factions ?
 
         // Create Nation Channels
-        _ = AddNationChannel(Race.Nuian, FactionsEnum.NuiaAlliance, "Nuian-Elf-Dwarf");
-        _ = AddNationChannel(Race.Hariharan, FactionsEnum.HaranyaAlliance, "Harani-Firran-Warborn");
+        _ = AddNationChannel(Race.Nuian, FactionsEnum.NuiaAlliance, "努伊安 - 精灵 - 矮人");
+        _ = AddNationChannel(Race.Hariharan, FactionsEnum.HaranyaAlliance, "哈拉尼 - 菲尔 - 战生");
 
         // Zone, Party/Raid, Guild, Family channels are created on the fly
     }
@@ -260,7 +260,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         if (!GuildChannels.ContainsKey(guild.Id))
         {
             if (!AddGuildChannel(guild))
-                Logger.Error("Failed to create guild chat channel !");
+                Logger.Error("创建公会聊天频道失败！");
         }
 
         if (GuildChannels.TryGetValue(guild.Id, out var channel))
@@ -269,7 +269,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         }
         else
         {
-            Logger.Error("Should not be able to get a null channel from GetGuildChat !");
+            Logger.Error("不应该从 GetGuildChat 获取到空频道！");
             return NullChannel;
         }
     }
@@ -296,7 +296,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         if (!FamilyChannels.ContainsKey(familyId))
         {
             if (!AddFamilyChannel(familyId))
-                Logger.Error("Failed to create family chat channel !");
+                Logger.Error("创建家族聊天频道失败！");
         }
 
         if (FamilyChannels.TryGetValue(familyId, out var channel))
@@ -305,7 +305,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         }
         else
         {
-            Logger.Error("Should not be able to get a null channel from GetFamilyChat !");
+            Logger.Error("不应该从 GetFamilyChat 获取到空频道！");
             return NullChannel;
         }
     }
@@ -348,7 +348,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         if (!PartyChannels.ContainsKey(partyId))
         {
             if (!AddPartyChannel(partyId))
-                Logger.Error("Failed to create party chat channel !");
+                Logger.Error("创建队伍聊天频道失败！");
         }
 
         if (PartyChannels.TryGetValue(partyId, out var channel))
@@ -358,7 +358,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         }
         else
         {
-            Logger.Error("Should not be able to get a null channel from GetPartyChat !");
+            Logger.Error("不应该从 GetPartyChat 获取到空频道！");
             return NullChannel;
         }
     }
@@ -385,7 +385,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         if (!RaidChannels.ContainsKey(party.Id))
         {
             if (!AddRaidChannel(party.Id))
-                Logger.Error("Failed to create party chat channel !");
+                Logger.Error("创建团队聊天频道失败！");
         }
 
         if (RaidChannels.TryGetValue(party.Id, out var channel))
@@ -395,7 +395,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         }
         else
         {
-            Logger.Error("Should not be able to get a null channel from GetRaidChat !");
+            Logger.Error("不应该从 GetRaidChat 获取到空频道！");
             return NullChannel;
         }
     }

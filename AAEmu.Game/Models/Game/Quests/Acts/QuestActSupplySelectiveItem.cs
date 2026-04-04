@@ -17,7 +17,7 @@ public class QuestActSupplySelectiveItem(QuestComponentTemplate parentComponent)
     /// <returns>Always returns true to allow progress even if this isn't the selected reward</returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), ItemId {ItemId}, Count {Count}, GradeId {GradeId}, Selected {quest.SelectedRewardIndex}, This {ThisSelectiveIndex}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，物品 ID {ItemId}，数量 {Count}，品质 ID {GradeId}，已选择 {quest.SelectedRewardIndex}，当前索引 {ThisSelectiveIndex}");
 
         // Only add reward if it was this selection
         if (quest.SelectedRewardIndex == ThisSelectiveIndex)

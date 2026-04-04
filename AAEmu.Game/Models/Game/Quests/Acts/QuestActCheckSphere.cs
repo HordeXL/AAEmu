@@ -33,7 +33,7 @@ public class QuestActCheckSphere(QuestComponentTemplate parentComponent) : Quest
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), SphereId {SphereId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务 {quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，球体 ID {SphereId}");
         return currentObjectiveCount > 0;
     }
 
@@ -41,7 +41,7 @@ public class QuestActCheckSphere(QuestComponentTemplate parentComponent) : Quest
     {
         if (questAct.Id == ActId && args.SphereQuest.QuestId != ParentQuestTemplate.Id)
             return;
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnEnterSphere: Quest {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id}), SphereId {SphereId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnEnterSphere: 任务 {questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})，球体 ID {SphereId}");
         SetObjective(questAct, 1);
     }
 
@@ -49,7 +49,7 @@ public class QuestActCheckSphere(QuestComponentTemplate parentComponent) : Quest
     {
         if (questAct.Id != ActId || args.SphereQuest.QuestId != ParentQuestTemplate.Id)
             return;
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnExitSphere: Quest {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id}), SphereId {SphereId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnExitSphere: 任务 {questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})，球体 ID {SphereId}");
         SetObjective(questAct, 0);
     }
 }

@@ -26,7 +26,7 @@ public class UseSkill : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Forces unit(target optional) to use a skill";
+        return "强制单位（可选目标）使用技能";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)

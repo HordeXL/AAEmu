@@ -681,7 +681,7 @@ public class ItemContainer
             var newItem = ItemManager.Instance.Create(templateId, addAmount, (byte)gradeToAdd);
             if (newItem == null)
             {
-                Logger.Error($"Failed to add item with ID {templateId}, possible duplicate entries!");
+                Logger.Error($"添加物品 ID {templateId} 失败，可能有条目重复！");
                 return false;
             }
 

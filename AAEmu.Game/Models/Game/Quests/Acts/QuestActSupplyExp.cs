@@ -16,7 +16,7 @@ public class QuestActSupplyExp(QuestComponentTemplate parentComponent) : QuestAc
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), Exp {Exp}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，经验 {Exp}");
         var player = quest.Owner as Character;
         player?.AddExp(Exp, true);
         return true;

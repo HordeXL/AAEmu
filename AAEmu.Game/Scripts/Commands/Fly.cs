@@ -41,7 +41,7 @@ public class Fly : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Enables or disables fly-mode (also makes you move at high-speed)";
+        return "启用或禁用飞行模式（也会让你高速移动）";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)

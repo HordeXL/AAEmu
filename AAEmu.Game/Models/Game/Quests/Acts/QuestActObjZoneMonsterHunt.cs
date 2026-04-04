@@ -20,7 +20,7 @@ public class QuestActObjZoneMonsterHunt(QuestComponentTemplate parentComponent) 
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), Zone {ZoneId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，区域 {ZoneId}");
         return quest.Template.Score > 0 ? currentObjectiveCount * Count >= quest.Template.Score : currentObjectiveCount > Count;
     }
 
@@ -44,7 +44,7 @@ public class QuestActObjZoneMonsterHunt(QuestComponentTemplate parentComponent) 
         if (args.Victim is not Npc npc)
             return;
 
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnZoneKill(@QuestActObjZoneMonsterHunt): Quest: {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id}), ZoneGroupId {args.ZoneGroupId}, NpcObjId {npc.ObjId}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnZoneKill(@QuestActObjZoneMonsterHunt): 任务：{questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})，区域组 ID {args.ZoneGroupId}，NPC 对象 ID {npc.ObjId}");
         AddObjective(questAct, 1);
     }
 }

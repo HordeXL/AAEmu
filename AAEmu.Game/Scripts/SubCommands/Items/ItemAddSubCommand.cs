@@ -16,7 +16,7 @@ public class ItemAddSubCommand : SubCommandBase
     {
         Title = "[Item]";
         Description =
-            "Adds to self or a player name or a selected target an amount of a specific item template of a specific [grade].";
+            "向自己、玩家名称或选中的目标添加特定 [grade] 的特定物品模板。";
         CallPrefix = $"{CommandManager.CommandPrefix}item add";
         AddParameter(new StringSubCommandParameter("target", "player name||target||self", true));
         AddParameter(new NumericSubCommandParameter<uint>("templateId", "template id", true));
@@ -38,7 +38,7 @@ public class ItemAddSubCommand : SubCommandBase
         {
             if (selfCharacter.CurrentTarget is null || selfCharacter.CurrentTarget is not Character)
             {
-                SendColorMessage(messageOutput, Color.Red, "Please select a valid character player");
+                SendColorMessage(messageOutput, Color.Red, "请选择一个有效的角色玩家");
                 return;
             }
 
@@ -53,7 +53,7 @@ public class ItemAddSubCommand : SubCommandBase
             var player = WorldManager.Instance.GetCharacter(firstArgument);
             if (player is null)
             {
-                SendColorMessage(messageOutput, Color.Red, $"Player: {firstArgument} was not found.");
+                SendColorMessage(messageOutput, Color.Red, $"未找到玩家：{firstArgument}。");
                 return;
             }
 
@@ -67,7 +67,7 @@ public class ItemAddSubCommand : SubCommandBase
         var itemTemplate = ItemManager.Instance.GetTemplate(templateId);
         if (itemTemplate is null)
         {
-            SendColorMessage(messageOutput, Color.Red, $"Item template id {templateId} does not exist!");
+            SendColorMessage(messageOutput, Color.Red, $"物品模板 ID {templateId} 不存在！");
             return;
         }
 
@@ -78,19 +78,19 @@ public class ItemAddSubCommand : SubCommandBase
             var currentBackpack = addTarget.Equipment.GetItemBySlot((int)EquipmentItemSlot.Backpack);
             if (currentBackpack != null)
             {
-                SendColorMessage(messageOutput, Color.Red, "No room on the backpack slot to place a tradepack!");
+                SendColorMessage(messageOutput, Color.Red, "背包插槽没有空间放置贸易包！");
                 return;
             }
 
             if (!addTarget.Equipment.AcquireDefaultItem(ItemTaskType.Gm, templateId, itemAmount, itemGrade))
             {
-                SendColorMessage(messageOutput, Color.Red, "Tradepack could not be created!");
+                SendColorMessage(messageOutput, Color.Red, "无法创建贸易包！");
                 return;
             }
         }
         else if (!addTarget.Inventory.Bag.AcquireDefaultItem(ItemTaskType.Gm, templateId, itemAmount, itemGrade))
         {
-            SendColorMessage(messageOutput, Color.Red, "Item could not be created!");
+            SendColorMessage(messageOutput, Color.Red, "无法创建物品！");
             return;
         }
 

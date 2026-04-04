@@ -108,8 +108,15 @@ public class TalkBehavior : BaseCombatBehavior
             bubbleId: (uint)bubble.Id,
             npcObjId: Ai.Owner.ObjId);
 
+        // Send the bubble packet for the speech bubble above NPC head
         player.BroadcastPacket(msgPacket, true);
         player.BroadcastPacket(sndPacket, true);
+
+        // Also send a regular chat message with NPC name for the chat box
+        var chatPacket = new SCChatMessagePacket(
+            ChatType.White,
+            message: $"[{Ai.Owner.Name}] {bubble.Bubble}");
+        player.SendPacket(chatPacket);
 
         if (selected.SkillId > 0)
             Ai.Owner.UseSkill((uint)selected.SkillId, player);

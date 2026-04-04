@@ -74,13 +74,13 @@ public class Teleport : ICommand
         if (AllowPingPos)
         {
             return
-                "Teleports you to target location. if no [location] is provided, you will get a list of available names. " +
-                "You can also use a period (.) as a location name to teleport to a location you marked on the map.";
+                "将你传送到目标位置。如果未提供 [location]，你将获得可用名称列表。" +
+                "你也可以使用句号 (.) 作为位置名称，传送到你在地图上标记的位置。";
         }
         else
         {
             return
-                "Teleports you to target location. if no [location] is provided, you will get a list of available names.";
+                "将你传送到目标位置。如果未提供 [location]，你将获得可用名称列表。";
         }
     }
 

@@ -23,7 +23,7 @@ public class Snow : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Enables or disables snow effect across the server";
+        return "启用或禁用服务器范围的雪景效果";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -49,7 +49,7 @@ public class Snow : ICommand
         else
         {
             // user input was invalid notify them
-            CommandManager.SendErrorText(this, messageOutput, $"Error parsing boolean");
+            CommandManager.SendErrorText(this, messageOutput, $"解析布尔值时出错");
         }
     }
 }

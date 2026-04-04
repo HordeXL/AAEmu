@@ -20,7 +20,7 @@ public class QuestActSupplyLp(QuestComponentTemplate parentComponent) : QuestAct
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), LaborPower {LaborPower}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，劳动之力 {LaborPower}");
         if (quest.Owner is Character player)
             player.ChangeLabor((short)LaborPower, 0);
         return true;

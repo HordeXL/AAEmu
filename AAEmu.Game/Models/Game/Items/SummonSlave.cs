@@ -90,7 +90,7 @@ public class SummonSlave : Item
             return;
 
         if (!owner.ParentWorld.SlaveManager.OnDeleteSlaveItem(this))
-            Logger.Warn($"Failed to delete Slave attached to Item Id: {Id}, Type: {TemplateId}");
+            Logger.Warn($"删除绑定到物品 ID: {Id}，类型：{TemplateId} 的奴隶失败");
     }
 
     public override bool CanDestroy()

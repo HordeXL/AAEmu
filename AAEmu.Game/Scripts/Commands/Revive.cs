@@ -24,7 +24,7 @@ public class Revive : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Revives target";
+        return "复活目标";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -46,12 +46,12 @@ public class Revive : ICommand
             }
             else
             {
-                character.SendMessage("Target is already alive");
+                character.SendMessage("目标还活着");
             }
         }
         else
         {
-            character.SendMessage("Cannot revive this target");
+            character.SendMessage("无法复活此目标");
         }
     }
 }

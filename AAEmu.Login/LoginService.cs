@@ -17,7 +17,7 @@ public sealed class LoginService(
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Starting daemon: AAEmu.Login");
+        logger.LogInformation("启动守护进程：AAEmu.Login");
 
         // Check for updates
         await using (var connection = connectionFactory.CreateConnection())
@@ -26,8 +26,8 @@ public sealed class LoginService(
                     dbConnectionsConfig.Value.MySQLProvider.Database,
                     dbConnectionsConfig.Value.AutoApplyUpdates))
             {
-                logger.LogCritical("Failed to update database!");
-                logger.LogCritical("Press Ctrl+C to quit");
+                logger.LogCritical("数据库更新失败！");
+                logger.LogCritical("按 Ctrl+C 退出");
                 return;
             }
         }
@@ -39,13 +39,13 @@ public sealed class LoginService(
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Stopping daemon.");
+        logger.LogInformation("停止守护进程。");
         internalNetwork.Stop();
         return Task.CompletedTask;
     }
 
     public void Dispose()
     {
-        logger.LogInformation("Disposing...");
+        logger.LogInformation("正在处置...");
     }
 }

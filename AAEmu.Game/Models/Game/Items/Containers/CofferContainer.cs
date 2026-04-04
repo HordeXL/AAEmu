@@ -46,7 +46,7 @@ public class CofferContainer(uint ownerId, bool createWithNewId)
         for (var i = Items.Count - 1; i >= 0; i--)
         {
             var item = Items[i];
-            Logger.Warn($"Destroying item {item.Id} from coffer item_container {ContainerId} due to delete");
+            Logger.Warn($"从保险箱物品容器 {ContainerId} 销毁物品 {item.Id}，由于删除");
             item._holdingContainer.RemoveItem(ItemTaskType.Invalid, item, true);
         }
 

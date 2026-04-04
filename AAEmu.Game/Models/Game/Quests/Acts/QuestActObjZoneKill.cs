@@ -38,7 +38,7 @@ public class QuestActObjZoneKill(QuestComponentTemplate parentComponent) : Quest
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), Zone {ZoneId}, Npc kills x {CountNpc} (Faction {NpcFactionId} Ex {NpcFactionExclusive}, Lv{LvlMinNpc}~{LvlMaxNpc}), PK x {CountPlayerKill} (Faction {PcFactionId} Ex {PcFactionExclusive}, Lv{LvlMin}~{LvlMax}), TeamShare {TeamShare}, IsParty {IsParty}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，区域 {ZoneId}，NPC 击杀 x {CountNpc} (阵营 {NpcFactionId} 排除 {NpcFactionExclusive}, 等级{LvlMinNpc}~{LvlMaxNpc}), PK x {CountPlayerKill} (阵营 {PcFactionId} 排除 {PcFactionExclusive}, 等级{LvlMin}~{LvlMax}), 团队共享 {TeamShare}, 组队 {IsParty}");
         return (CountNpc > 0 && currentObjectiveCount >= CountNpc) || (CountPlayerKill > 0 && currentObjectiveCount >= CountPlayerKill);
     }
 

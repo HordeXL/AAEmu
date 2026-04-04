@@ -42,7 +42,7 @@ public sealed class GameService : IHostedService, IDisposable
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        Logger.Info("Starting daemon: AAEmu.Game");
+        Logger.Info("启动守护进程：AAEmu.Game");
 
         // Check for updates
         using (var connection = MySQL.CreateConnection())
@@ -50,8 +50,8 @@ public sealed class GameService : IHostedService, IDisposable
             if (!MySqlDatabaseUpdater.Run(connection, "aaemu_game", AppConfiguration.Instance.Connections.MySQLProvider.Database,
                     AppConfiguration.Instance.Connections.AutoApplyUpdates))
             {
-                Logger.Fatal("Failed to update database!");
-                Logger.Fatal("Press Ctrl+C to quit");
+                Logger.Fatal("数据库更新失败！");
+                Logger.Fatal("按 Ctrl+C 退出");
                 return;
             }
         }
@@ -59,8 +59,8 @@ public sealed class GameService : IHostedService, IDisposable
         ClientFileManager.Initialize();
         if (ClientFileManager.Sources.Count == 0)
         {
-            Logger.Fatal($"Failed up load client files! ({string.Join(", ", AppConfiguration.Instance.ClientData.Sources)})");
-            Logger.Fatal("Press Ctrl+C to quit");
+            Logger.Fatal($"客户端文件加载失败！({string.Join(", ", AppConfiguration.Instance.ClientData.Sources)})");
+            Logger.Fatal("按 Ctrl+C 退出");
             return;
         }
 
@@ -111,12 +111,12 @@ public sealed class GameService : IHostedService, IDisposable
         LoginNetwork.Instance.Start();
 
         stopWatch.Stop();
-        Logger.Info($"Server started! Took {stopWatch.Elapsed}");
+        Logger.Info($"服务器启动完成！耗时 {stopWatch.Elapsed}");
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        Logger.Info("Stopping daemon...");
+        Logger.Info("停止守护进程...");
 
         await SaveManager.Instance.StopAsync();
 
@@ -142,7 +142,7 @@ public sealed class GameService : IHostedService, IDisposable
 
     public void Dispose()
     {
-        Logger.Info("Disposing...");
+        Logger.Info("正在处置...");
 
         LogManager.Flush();
     }

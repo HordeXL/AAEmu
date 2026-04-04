@@ -551,7 +551,7 @@ public class LootPack
 
             if (!character.Inventory.TryAddNewItem(taskType, itemTemplateId, count, gradeToAdd))
             {
-                Logger.Error($"Unable to give loot to {character.Name} - ItemId: {itemTemplate} x {count} at grade {gradeToAdd} (loot grade {grade})");
+                Logger.Error($"无法将战利品给予 {character.Name} - 物品 ID: {itemTemplate} x {count}，品质 {gradeToAdd}（战利品品质 {grade}）");
                 return false;
             }
         }

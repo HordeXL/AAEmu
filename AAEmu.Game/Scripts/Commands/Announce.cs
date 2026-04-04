@@ -43,17 +43,17 @@ public class Announce : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Broadcasts a server-wide message in a given style.\r\n" +
-               "<NoticeType> is a value from 1-3 (default 3), " +
-               "<Color> is a RGB or ARGB value in Hex, " +
-               "<VisibleTime> is in milliseconds\r\n" +
-               "If the first arguments isn't a valid NoticeType, all arguments are treated as the message using default color and time settings for type 3.\r\n" +
-               "examples:\r\n" +
+        return "广播服务器范围的消息。\r\n" +
+               "<NoticeType> 是 1-3 的值（默认 3），" +
+               "<Color> 是十六进制 RGB 或 ARGB 值，" +
+               "<VisibleTime> 以毫秒为单位\r\n" +
+               "如果第一个参数不是有效的 NoticeType，所有参数将被视为消息，使用类型 3 的默认颜色和時間设置。\r\n" +
+               "示例:\r\n" +
                CommandManager.CommandPrefix +
-               $"{CommandNames[0]} 3 FF00FF00 5000 Text here use as many spaces as you wish\r\n" +
-               CommandManager.CommandPrefix + $"{CommandNames[0]} 3 FFFF00 2500 Text here is in yellow\r\n" +
-               CommandManager.CommandPrefix + $"{CommandNames[0]} 3 red 2500 Text here is in red\r\n" +
-               CommandManager.CommandPrefix + $"{CommandNames[0]} Automatically generated lime text";
+               $"{CommandNames[0]} 3 FF00FF00 5000 这里可以使用任意多个空格\r\n" +
+               CommandManager.CommandPrefix + $"{CommandNames[0]} 3 FFFF00 2500 这里是黄色文字\r\n" +
+               CommandManager.CommandPrefix + $"{CommandNames[0]} 3 red 2500 这里是红色文字\r\n" +
+               CommandManager.CommandPrefix + $"{CommandNames[0]} 自动生成的酸橙绿文字";
     }
 
     private static Color NameOrHexColor(string hex)
@@ -145,11 +145,11 @@ public class Announce : ICommand
                 messageVisibleTime, message));
 
             //send back confirmation script executed to script runner
-            CommandManager.SendNormalText(this, messageOutput, $"Announcement sent.");
+            CommandManager.SendNormalText(this, messageOutput, $"公告已发送。");
         }
         catch (Exception x)
         {
-            CommandManager.SendErrorText(this, messageOutput, $"Exception: {x.Message}");
+            CommandManager.SendErrorText(this, messageOutput, $"异常：{x.Message}");
         }
     }
 }

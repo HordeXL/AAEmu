@@ -32,7 +32,7 @@ public partial class Quest
         }
 
         if (QuestSteps.Count <= 0)
-            Logger.Warn($"Quest {TemplateId} does not seem to have any components!");
+        Logger.Warn($"任务 {TemplateId} 似乎没有任何组件！");
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public partial class Quest
     {
         if (!QuestSteps.TryGetValue(QuestComponentKind.Start, out var stepStart))
         {
-            Logger.Warn($"Tried to start a quest without a starter component Quest: {TemplateId}");
+                Logger.Warn($"尝试启动没有起始组件的任务 Quest: {TemplateId}");
             return false;
         }
 
@@ -51,7 +51,7 @@ public partial class Quest
         // Send the first components, or the one that's used to start this ?
         ComponentId = stepStart.Components.Values.FirstOrDefault()?.Template.Id ?? 0;
         Owner.SendPacket(new SCQuestContextStartedPacket(this, ComponentId));
-        Logger.Debug($"StartQuest, Quest:{TemplateId}, Player {Owner.Name} ({Owner.Id})");
+        Logger.Debug($"StartQuest，任务:{TemplateId}，玩家 {Owner.Name} ({Owner.Id})");
         return true;
     }
 
@@ -102,7 +102,7 @@ public partial class Quest
             // Shouldn't happen, but check for infinite loops
             if (loopLockCheck > 20)
             {
-                Logger.Error($"GoToNextStep got stuck in a infinite loop for Quest:{TemplateId}, Step:{lastStep} -> {Step}, Player {Owner.Name} ({Owner.Id}");
+                Logger.Error($"GoToNextStep 陷入无限循环 Quest:{TemplateId}，Step:{lastStep} -> {Step}，玩家 {Owner.Name} ({Owner.Id}");
                 break;
             }
             loopLockCheck++;
@@ -150,7 +150,7 @@ public partial class Quest
 
                     return;
                 default:
-                    Logger.Warn($"Quest GoToNextStep failed for Step:{Step}, Quest:{TemplateId}, Player:{Owner.Name} ({Owner.Id}");
+                    Logger.Warn($"任务 GoToNextStep 失败 Step:{Step}，Quest:{TemplateId}，Player:{Owner.Name} ({Owner.Id}");
                     return;
             }
 

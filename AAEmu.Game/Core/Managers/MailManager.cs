@@ -60,19 +60,19 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
         var targetId = nameManager.GetCharacterId(mail.Header.ReceiverName);
         if (!string.Equals(targetName, mail.Header.ReceiverName, StringComparison.InvariantCultureIgnoreCase))
         {
-            Logger.Debug("Send() - Failed to verify receiver name {0} != {1}", targetName, mail.Header.ReceiverName);
+            Logger.Debug("Send() - 验证收件人名称失败 {0} != {1}", targetName, mail.Header.ReceiverName);
             return false; // Name mismatch
         }
         if (targetId != mail.Header.ReceiverId)
         {
-            Logger.Debug("Send() - Failed to verify receiver id {0} != {1}", targetId, mail.Header.ReceiverId);
+            Logger.Debug("Send() - 验证收件人 ID 失败 {0} != {1}", targetId, mail.Header.ReceiverId);
             return false; // Id mismatch
         }
 
         // Assign a Id if we didn't have one yet
         if (mail.Id <= 0)
         {
-            Logger.Trace("Send() - Assign new mail Id");
+            Logger.Trace("Send() - 分配新邮件 ID");
             mail.Id = GetNewMailId();
         }
         _allPlayerMails.Add(mail.Id, mail);
@@ -111,7 +111,7 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"Failed to remove mail attachment [{i}] from {mail.Id}: {ex}");
+                    Logger.Error($"无法从 {mail.Id} 移除邮件附件 [{i}]：{ex}");
                 }
             }
         }
@@ -121,7 +121,7 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
     #region Database
     public void Load()
     {
-        Logger.Info("Loading player mails ...");
+        Logger.Info("正在加载玩家邮件 ...");
         _allPlayerMails = [];
         _deletedMailIds = [];
 
@@ -176,7 +176,7 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
                                 }
                                 else
                                 {
-                                    Logger.Warn("Found orphaned itemId {0} in mailId {1}, not loaded!", itemId, tempMail.Id);
+                                    Logger.Warn("在邮件 ID {1} 中发现孤立的物品 ID {0}，未加载！", itemId, tempMail.Id);
                                 }
                             }
                         }
@@ -188,7 +188,7 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
                         if (tempMail.Body.MoneyAmount2 > 0)
                             attachmentCount++;
                         if (attachmentCount != tempMail.Header.Attachments)
-                            Logger.Warn("Attachment count listed in mailId {0} did not match the number of attachments, possible mail or item corruption !", tempMail.Id);
+                            Logger.Warn("邮件 ID {0} 中列出的附件数量与实际附件数量不匹配，可能是邮件或物品损坏！", tempMail.Id);
                         // Reset the attachment counter
                         tempMail.Header.Attachments = (byte)attachmentCount;
 
@@ -204,7 +204,7 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
                 }
             }
         }
-        Logger.Info("Loaded {0} player mails", _allPlayerMails.Count);
+        Logger.Info("已加载 {_allPlayerMails.Count} 封玩家邮件");
 
         var mailCheckTask = new MailDeliveryTask();
         taskManager.Schedule(mailCheckTask, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(5));
@@ -358,7 +358,7 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
 
     public void CheckAllMailTimings()
     {
-        // Deliver yet "undelivered" mails
+        // 发送尚未“已发送”的邮件
         Logger.Trace("CheckAllMailTimings");
         var undeliveredMails = _allPlayerMails.Where(x => x.Value.Body.RecvDate <= DateTime.UtcNow && x.Value.IsDelivered == false).ToDictionary(x => x.Key, x => x.Value);
         var delivered = 0;
@@ -366,7 +366,7 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
             if (NotifyNewMailByNameIfOnline(mail.Value, mail.Value.Header.ReceiverName))
                 delivered++;
         if (delivered > 0)
-            Logger.Debug($"{delivered}/{undeliveredMails.Count} mail(s) delivered");
+            Logger.Debug($"{delivered}/{undeliveredMails.Count} 封邮件已送达");
 
         // TODO: Return expired mails back to owner if undelivered/unread
     }
@@ -433,7 +433,7 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
                 }
 
                 if (consumedCerts != 0)
-                    Logger.Error("Something went wrong when paying tax for mailId {0}", mail.Id);
+                    Logger.Error("支付邮件 {0} 的税金时出现问题", mail.Id);
 
                 mail.Body.BillingAmount = consumedCerts;
 
@@ -455,7 +455,7 @@ public class MailManager(IMailIdManager mailIdManager, INameManager nameManager,
         }
 
         if (!housingManager.Value.PayWeeklyTax(house))
-            Logger.Error("Could not update protection time when paying taxes, mailId {0}", mail.Id);
+            Logger.Error("无法更新支付税金的保护时间，邮件 ID {0}", mail.Id);
         else
         {
             if (mail.Header.Status != MailStatus.Read)

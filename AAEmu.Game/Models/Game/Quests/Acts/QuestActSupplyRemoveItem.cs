@@ -18,7 +18,7 @@ public class QuestActSupplyRemoveItem(QuestComponentTemplate parentComponent) : 
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), ItemId {ItemId}, Count {Count}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，物品 ID {ItemId}，数量 {Count}");
 
         if (quest.Owner is Character player)
         {
@@ -27,7 +27,7 @@ public class QuestActSupplyRemoveItem(QuestComponentTemplate parentComponent) : 
             var toRemove = Math.Min(unitsCount, Count);
             var removed = player.Inventory.ConsumeItem(null, ItemTaskType.QuestRemoveSupplies, ItemId, toRemove, null);
             if (removed < Count)
-                Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Did not have enough items to remove Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), ItemId {ItemId}, Count {removed}/{toRemove}(of {Count}) (found {unitsCount})");
+                Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 没有足够的物品来移除 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，物品 ID {ItemId}，数量 {removed}/{toRemove}(拥有 {unitsCount})");
 
             return true;
         }

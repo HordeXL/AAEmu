@@ -49,11 +49,11 @@ public class QuestCommandUtil
                 }
                 else
                 {
-                    CommandManager.SendErrorText(command, messageOutput, "Proper usage: /quest add <questId> [<questAcceptorType> <acceptorId>]\nYou can also target the quest giver instead of providing the acceptor type and id");
+                    CommandManager.SendErrorText(command, messageOutput, "正确用法：/quest add <questId> [<questAcceptorType> <acceptorId>]\n你也可以通过任务发布者而不是提供接受者类型和 ID");
                 }
                 break;
             case "list":
-                CommandManager.SendNormalText(command, messageOutput, "LIST");
+                CommandManager.SendNormalText(command, messageOutput, "任务列表");
                 foreach (var quest in character.Quests.ActiveQuests.Values)
                 {
                     var objectives = quest.GetObjectives(quest.Step).Select(t => t.ToString()).ToList();
@@ -71,20 +71,20 @@ public class QuestCommandUtil
                             {
                                 if (character.Quests.SetStep(questId, (uint)stepId))
                                     CommandManager.SendNormalText(command, messageOutput,
-                                        $"Set Step {stepId} for Quest {questId}");
+                                        $"设置任务 {questId} 的步骤为 {stepId}");
                                 else
-                                    CommandManager.SendErrorText(command, messageOutput, "Proper usage: /quest step <questId> <stepId>");
+                                    CommandManager.SendErrorText(command, messageOutput, "正确用法：/quest step <questId> <stepId>");
                             }
                         }
                         else
                         {
-                            CommandManager.SendErrorText(command, messageOutput, $"You do not have the quest {questId}");
+                            CommandManager.SendErrorText(command, messageOutput, $"你没有任务 {questId}");
                         }
                     }
                 }
                 else
                 {
-                    CommandManager.SendErrorText(command, messageOutput, "Proper usage: /quest step <questId> <stepId>");
+                    CommandManager.SendErrorText(command, messageOutput, "正确用法：/quest step <questId> <stepId>");
                 }
                 break;
             case "prog":

@@ -156,7 +156,7 @@ public class EquipmentContainer : ItemContainer
 
         if (targetSlot < 0 || targetSlot >= ContainerSize)
         {
-            Logger.Warn($"{Owner?.Name} ({OwnerId}) tried to equip a item that is out of range of the valid slots {targetSlot}/{ContainerSize}");
+            Logger.Warn($"{Owner?.Name} ({OwnerId}) 尝试装备超出有效插槽范围的物品 {targetSlot}/{ContainerSize}");
             return false; // must be in equipment slot range
         }
 
@@ -174,14 +174,14 @@ public class EquipmentContainer : ItemContainer
             slotTypeId = EquipmentItemSlotType.Backpack;
         else
         {
-            Logger.Warn($"{Owner?.Name} ({OwnerId}) tried to equip a non-equipable item {item.Template.Name} ({item.TemplateId}), Id:{item.Id}");
+            Logger.Warn($"{Owner?.Name} ({OwnerId}) 尝试装备不可装备的物品 {item.Template.Name} ({item.TemplateId})，ID:{item.Id}");
             return false; // must be a equip-able item
         }
 
         // No expected slot was defined, we can't accept that here
         if (slotTypeId == (EquipmentItemSlotType)255)
         {
-            Logger.Fatal($"{Owner?.Name} ({OwnerId}) tried to equip a equippable item that has no slot defined {item.Template.Name} ({item.TemplateId}), Id:{item.Id}, TargetSlot:{(EquipmentItemSlot)targetSlot}");
+            Logger.Fatal($"{Owner?.Name} ({OwnerId}) 尝试装备没有定义插槽的可装备物品 {item.Template.Name} ({item.TemplateId})，ID:{item.Id}，目标插槽:{(EquipmentItemSlot)targetSlot}");
             return false;
         }
 
@@ -190,7 +190,7 @@ public class EquipmentContainer : ItemContainer
 
         if (!allowedSlots.Contains(equipSlot))
         {
-            Logger.Warn($"{Owner?.Name} ({OwnerId}) tried to equip a item in the wrong slot {item.Template.Name} ({item.TemplateId}), Id:{item.Id}, SlotType: {equipSlot}, TargetSlot:{(EquipmentItemSlot)targetSlot}");
+            Logger.Warn($"{Owner?.Name} ({OwnerId}) 尝试将物品放入错误的插槽 {item.Template.Name} ({item.TemplateId})，ID:{item.Id}，插槽类型：{equipSlot}，目标插槽:{(EquipmentItemSlot)targetSlot}");
             return false; // not in the list of allowed slots, remove the item
         }
 

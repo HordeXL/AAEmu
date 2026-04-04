@@ -144,7 +144,7 @@ public partial class QuestManager(ITaskManager taskManager, IZoneManager zoneMan
             if (!EvaluationQueue.Contains(quest))
                 EvaluationQueue.Enqueue(quest);
 
-            Logger.Info($"EnqueueEvaluation, {quest.Owner.Name} ({quest.Owner.Id}), Quest {quest.TemplateId}");
+            Logger.Info($"入队评估，{quest.Owner.Name} ({quest.Owner.Id})，任务 {quest.TemplateId}");
 
             if (needNewTask)
                 taskManager.Schedule(new QuestManagerRunQueueTask(), null, TimeSpan.FromMilliseconds(1));
@@ -162,7 +162,7 @@ public partial class QuestManager(ITaskManager taskManager, IZoneManager zoneMan
             {
                 var quest = EvaluationQueue.Dequeue();
                 quest.StartingEvaluation();
-                Logger.Info($"DoQueuedEvaluations, {quest.Owner.Name} ({quest.Owner.Id}), Quest {quest.TemplateId}");
+                Logger.Info($"执行队列评估，{quest.Owner.Name} ({quest.Owner.Id})，任务 {quest.TemplateId}");
                 var currentResult = quest.RunCurrentStep();
             }
         }
@@ -177,13 +177,13 @@ public partial class QuestManager(ITaskManager taskManager, IZoneManager zoneMan
     {
         if (!owner.Quests.ActiveQuests.TryGetValue(questId, out var quest))
         {
-            Logger.Warn($"FailQuest triggered for a quest that isn't active, Quest:{questId}, Player:{owner.Name} ({owner.Id})");
+            Logger.Warn($"FailQuest 触发了一个未激活的任务，任务:{questId}，玩家:{owner.Name} ({owner.Id})");
             return;
         }
 
         quest.Step = QuestComponentKind.Fail;
         //owner.Quests.Drop(questId, true);
-        Logger.Debug($"[Quest] {owner.Name}, quest {questId} failed.");
+        Logger.Debug($"[任务] {owner.Name}，任务 {questId} 失败。");
     }
 
     /// <summary>
@@ -240,7 +240,7 @@ public partial class QuestManager(ITaskManager taskManager, IZoneManager zoneMan
             if (type.BaseType == typeof(QuestActTemplate))
                 _actTemplatesByDetailType.Add(type.Name, []);
 
-        Logger.Info("Loading quests...");
+        Logger.Info("正在加载任务...");
         using (var connection = SQLite.CreateConnection())
         {
             LoadQuestSupplies(connection);
@@ -255,7 +255,7 @@ public partial class QuestManager(ITaskManager taskManager, IZoneManager zoneMan
 
             UpdateQuestComponentActs();
         }
-        Logger.Info($"Loaded {_questTemplates.Count} quests");
+        Logger.Info($"已加载 {_questTemplates.Count} 个任务");
         _loaded = true;
 
         // Start daily reset task
@@ -389,7 +389,7 @@ public partial class QuestManager(ITaskManager taskManager, IZoneManager zoneMan
             var actId = reader.GetUInt32("id");
             if (!_componentTemplates.TryGetValue(componentId, out var questComponentTemplate))
             {
-                Logger.Trace($"LoadQuestActs: ActId {actId} references quest ComponentId {componentId} that does not exist");
+                Logger.Trace($"LoadQuestActs: ActId {actId} 引用的任务 ComponentId {componentId} 不存在");
                 continue;
             }
             var template = new QuestActTemplate(questComponentTemplate)
@@ -1924,7 +1924,7 @@ public partial class QuestManager(ITaskManager taskManager, IZoneManager zoneMan
             }
         }
 
-        Logger.Trace($"GetComponentByActTemplate no Component found that holds {actDetailType} {actTemplateId}");
+        Logger.Trace($"GetComponentByActTemplate 未找到包含 {actDetailType} {actTemplateId} 的组件");
         return null;
     }
 

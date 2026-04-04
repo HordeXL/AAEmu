@@ -21,7 +21,7 @@ public class QuestActObjMonsterHunt(QuestComponentTemplate parentComponent) : Qu
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), NpcId {NpcId}, Count {currentObjectiveCount}/{Count}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，NPC ID {NpcId}，数量 {currentObjectiveCount}/{Count}");
         return currentObjectiveCount >= Count;
     }
 
@@ -42,7 +42,7 @@ public class QuestActObjMonsterHunt(QuestComponentTemplate parentComponent) : Qu
         if (questAct.Id != ActId || args.NpcId != NpcId)
             return;
 
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnMonsterHunt: Quest: {questAct.QuestComponent.Parent.Parent.TemplateId}, Owner {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id}), NpcId {args.NpcId}, Count {args.Count}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).OnMonsterHunt: 任务：{questAct.QuestComponent.Parent.Parent.TemplateId}，所有者 {questAct.QuestComponent.Parent.Parent.Owner.Name} ({questAct.QuestComponent.Parent.Parent.Owner.Id})，NPC ID {args.NpcId}，数量 {args.Count}");
         AddObjective(questAct, (int)args.Count);
     }
 }

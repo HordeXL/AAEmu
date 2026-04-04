@@ -17,7 +17,7 @@ public class QuestActSupplyLivingPoint(QuestComponentTemplate parentComponent) :
     /// <returns></returns>
     public override bool RunAct(Quest quest, QuestAct questAct, int currentObjectiveCount)
     {
-        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: Quest: {quest.TemplateId}, Owner {quest.Owner.Name} ({quest.Owner.Id}), Point {Point}");
+        Logger.Debug($"{QuestActTemplateName}({DetailId}).RunAct: 任务：{quest.TemplateId}，所有者 {quest.Owner.Name} ({quest.Owner.Id})，点数 {Point}");
         var player = quest.Owner as Character;
         player?.ChangeGamePoints(GamePointKind.Vocation, Point);
         return true;

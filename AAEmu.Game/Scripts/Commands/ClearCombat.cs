@@ -22,7 +22,7 @@ public class ClearCombat : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Force sends a clear combat packet. Does not actually clear the combat flag on the server!";
+        return "强制发送清除战斗状态的数据包。实际上并不会清除服务器上的战斗标志！";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)

@@ -23,7 +23,7 @@ public class Help : ICommand
     public string GetCommandHelpText()
     {
         return
-            "Displays help about a command <topic>. If no <topic> is provided, a list of all GM commands will be displayed";
+            "显示关于命令 <topic> 的帮助。如果未提供 <topic>，将显示所有 GM 命令列表";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -35,8 +35,8 @@ public class Help : ICommand
                 character.AccessLevel)
             {
                 // deliberately the same error as command not found 
-                character.SendMessage("Help for: |cFFFFFFFF" + CommandManager.CommandPrefix + thisCommand +
-                                      "|r not available!");
+                character.SendMessage("关于以下命令的帮助不可用：|cFFFFFFFF" + CommandManager.CommandPrefix + thisCommand +
+                                      "|r");
             }
             else
             {
@@ -44,21 +44,21 @@ public class Help : ICommand
                 if (cmd == null)
                 {
                     // deliberately the same error as insufficient rights 
-                    character.SendMessage("Help for: |cFFFFFFFF" + CommandManager.CommandPrefix + thisCommand +
-                                          "|r not available!");
+                    character.SendMessage("关于以下命令的帮助不可用：|cFFFFFFFF" + CommandManager.CommandPrefix + thisCommand +
+                                          "|r");
                     return;
                 }
 
                 var helpLineText = cmd.GetCommandLineHelp();
                 var helpText = cmd.GetCommandHelpText();
-                character.SendMessage("Help for: |cFFFFFFFF" + CommandManager.CommandPrefix + thisCommand + " " +
+                character.SendMessage("关于以下命令的帮助：|cFFFFFFFF" + CommandManager.CommandPrefix + thisCommand + " " +
                                       helpLineText + "|r\n|cFF999999" + helpText + "|r");
             }
 
             return;
         }
 
-        character.SendMessage("|cFF80FFFFList of available GM Commands|r\n-------------------------\n");
+        character.SendMessage("|cFF80FFFF可用 GM 命令列表|r\n-------------------------\n");
         var list = CommandManager.Instance.GetCommandKeys();
         list.Sort();
         var characterAccessLevel = CharacterManager.Instance.GetEffectiveAccessLevel(character);

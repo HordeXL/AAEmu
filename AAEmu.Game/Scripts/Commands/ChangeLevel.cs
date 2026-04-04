@@ -25,8 +25,8 @@ public class ChangeLevel : ICommand
 
     public string GetCommandHelpText()
     {
-        return $"Adds experience points needed to reach target <level>\n" +
-               $"Allowed range is 2-{ExperienceManager.Instance.MaxPlayerLevel} and {ExperienceManager.Instance.MaxMateLevel} for pets\n";
+        return $"添加达到目标 <level> 所需的经验值\n" +
+               $"允许范围是 2-{ExperienceManager.Instance.MaxPlayerLevel}，宠物为 {ExperienceManager.Instance.MaxMateLevel}\n";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -51,7 +51,7 @@ public class ChangeLevel : ICommand
             if (level <= 1 || level > ExperienceManager.Instance.MaxMateLevel)
             {
                 CommandManager.SendErrorText(this, messageOutput,
-                    $"Allowed level range: 2-{ExperienceManager.Instance.MaxMateLevel}|r");
+                    $"允许等级范围：2-{ExperienceManager.Instance.MaxMateLevel}|r");
                 return;
             }
 
@@ -71,7 +71,7 @@ public class ChangeLevel : ICommand
             if (level <= 1 || level > ExperienceManager.Instance.MaxPlayerLevel)
             {
                 CommandManager.SendErrorText(this, messageOutput,
-                    $"Allowed level range: 2-{ExperienceManager.Instance.MaxPlayerLevel}|r");
+                    $"允许等级范围：2-{ExperienceManager.Instance.MaxPlayerLevel}|r");
                 return;
             }
 

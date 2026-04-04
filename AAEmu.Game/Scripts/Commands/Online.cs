@@ -24,7 +24,7 @@ public class Online : ICommand
     public string GetCommandHelpText()
     {
         return
-            "Lists the number of online players. If a filter or * is provided, it will be used as a filter to show up to 100 names as well.";
+            "列出在线玩家数量。如果提供了过滤器或 *，它将用作过滤器以显示最多 100 个名称。";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
