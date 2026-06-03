@@ -295,7 +295,7 @@ public partial class Character : Unit, ICharacter
             var parameters = new Dictionary<string, double> { ["level"] = Level };
             var result = formula.Evaluate(parameters);
             var res = result;
-            foreach (var item in Inventory.Equipment.Items)
+            foreach (var item in Equipment.Items)
                 if (item is EquipItem equip)
                     res += equip.Str;
             res = CalculateWithBonuses(res, UnitAttribute.Str);
@@ -312,7 +312,7 @@ public partial class Character : Unit, ICharacter
             var formula = FormulaManager.Instance.GetUnitFormula(FormulaOwnerType.Character, UnitFormulaKind.Dex);
             var parameters = new Dictionary<string, double> { ["level"] = Level };
             var res = formula.Evaluate(parameters);
-            foreach (var item in Inventory.Equipment.Items)
+            foreach (var item in Equipment.Items)
                 if (item is EquipItem equip)
                     res += equip.Dex;
             res = CalculateWithBonuses(res, UnitAttribute.Dex);
@@ -329,7 +329,7 @@ public partial class Character : Unit, ICharacter
             var formula = FormulaManager.Instance.GetUnitFormula(FormulaOwnerType.Character, UnitFormulaKind.Sta);
             var parameters = new Dictionary<string, double> { ["level"] = Level };
             var res = formula.Evaluate(parameters);
-            foreach (var item in Inventory.Equipment.Items)
+            foreach (var item in Equipment.Items)
                 if (item is EquipItem equip)
                     res += equip.Sta;
             res = CalculateWithBonuses(res, UnitAttribute.Sta);
@@ -346,7 +346,7 @@ public partial class Character : Unit, ICharacter
             var formula = FormulaManager.Instance.GetUnitFormula(FormulaOwnerType.Character, UnitFormulaKind.Int);
             var parameters = new Dictionary<string, double> { ["level"] = Level };
             var res = formula.Evaluate(parameters);
-            foreach (var item in Inventory.Equipment.Items)
+            foreach (var item in Equipment.Items)
                 if (item is EquipItem equip)
                     res += equip.Int;
             res = CalculateWithBonuses(res, UnitAttribute.Int);
@@ -363,7 +363,7 @@ public partial class Character : Unit, ICharacter
             var formula = FormulaManager.Instance.GetUnitFormula(FormulaOwnerType.Character, UnitFormulaKind.Spi);
             var parameters = new Dictionary<string, double> { ["level"] = Level };
             var res = formula.Evaluate(parameters);
-            foreach (var item in Inventory.Equipment.Items)
+            foreach (var item in Equipment.Items)
                 if (item is EquipItem equip)
                     res += equip.Spi;
             res = CalculateWithBonuses(res, UnitAttribute.Spi);
@@ -1091,7 +1091,7 @@ public partial class Character : Unit, ICharacter
                 ["fai"] = Fai
             };
             var res = (int)formula.Evaluate(parameters);
-            foreach (var item in Inventory.Equipment.Items)
+            foreach (var item in Equipment.Items)
             {
                 switch (item)
                 {
@@ -1131,7 +1131,7 @@ public partial class Character : Unit, ICharacter
                 ["fai"] = Fai
             };
             var res = (int)formula.Evaluate(parameters);
-            foreach (var item in Inventory.Equipment.Items)
+            foreach (var item in Equipment.Items)
             {
                 switch (item)
                 {
@@ -1945,6 +1945,10 @@ public partial class Character : Unit, ICharacter
             value = 0;
         }
 
+        // PvP assist tracking: remember who hit us recently
+        if (attacker is Character enemyChar && value > 0 && enemyChar.Id != this.Id)
+            RecordPvpDamageFrom(enemyChar);
+
         base.ReduceCurrentHp(attacker, value, killReason);
     }
 
@@ -2168,6 +2172,8 @@ public partial class Character : Unit, ICharacter
                     character.JuryPoint = reader.GetInt32("jury_point");
                     character.HostileFactionKills = reader.GetUInt32("hostile_faction_kills");
                     character.HonorGainedInCombat = reader.GetUInt32("pvp_honor");
+                    character.DiedInPvp = reader.GetBoolean("died_in_pvp");
+                    character.DiedInPvpWarZone = reader.GetBoolean("died_in_pvp_war_zone");
                     character.TransferRequestTime = reader.GetDateTime("transfer_request_time");
                     character.DeleteRequestTime = reader.GetDateTime("delete_request_time");
                     character.DeleteTime = reader.GetDateTime("delete_time");
@@ -2285,6 +2291,8 @@ public partial class Character : Unit, ICharacter
                     character.JuryPoint = reader.GetInt16("jury_point");
                     character.HostileFactionKills = reader.GetUInt32("hostile_faction_kills");
                     character.HonorGainedInCombat = reader.GetUInt32("pvp_honor");
+                    character.DiedInPvp = reader.GetBoolean("died_in_pvp");
+                    character.DiedInPvpWarZone = reader.GetBoolean("died_in_pvp_war_zone");
                     character.TransferRequestTime = reader.GetDateTime("transfer_request_time");
                     character.DeleteRequestTime = reader.GetDateTime("delete_request_time");
                     character.DeleteTime = reader.GetDateTime("delete_time");
@@ -2523,6 +2531,7 @@ public partial class Character : Unit, ICharacter
                     "`world_id`,`zone_id`,`x`,`y`,`z`,`roll`,`pitch`,`yaw`," +
                     "`faction_id`,`faction_name`,`expedition_id`,`family`,`dead_count`,`dead_time`,`rez_wait_duration`,`rez_time`,`rez_penalty_duration`,`leave_time`," +
                     "`money`,`money2`,`honor_point`,`vocation_point`,`crime_point`,`crime_record`,`jury_point`," +
+                    "`hostile_faction_kills`,`pvp_honor`,`died_in_pvp`,`died_in_pvp_war_zone`," +
                     "`delete_request_time`,`transfer_request_time`,`delete_time`,`auto_use_aapoint`,`prev_point`,`point`,`gift`," +
                     "`num_inv_slot`,`num_bank_slot`,`expanded_expert`,`slots`,`created_at`,`updated_at`,`return_district`,`online_time`" +
                     ") VALUES (" +
@@ -2531,6 +2540,7 @@ public partial class Character : Unit, ICharacter
                     "@world_id,@zone_id,@x,@y,@z,@yaw,@pitch,@roll," +
                     "@faction_id,@faction_name,@expedition_id,@family,@dead_count,@dead_time,@rez_wait_duration,@rez_time,@rez_penalty_duration,@leave_time," +
                     "@money,@money2,@honor_point,@vocation_point,@crime_point,@crime_record,@jury_point," +
+                    "@hostile_faction_kills,@pvp_honor,@died_in_pvp,@died_in_pvp_war_zone," +
                     "@delete_request_time,@transfer_request_time,@delete_time,@auto_use_aapoint,@prev_point,@point,@gift," +
                     "@num_inv_slot,@num_bank_slot,@expanded_expert,@slots,@created_at,@updated_at,@return_district,@online_time)";
 
@@ -2551,13 +2561,28 @@ public partial class Character : Unit, ICharacter
                 command.Parameters.AddWithValue("@ability2", (byte)Ability2);
                 command.Parameters.AddWithValue("@ability3", (byte)Ability3);
                 command.Parameters.AddWithValue("@world_id", ServerId);
-                command.Parameters.AddWithValue("@zone_id", MainWorldPosition?.ZoneId ?? Transform.ZoneId);
-                command.Parameters.AddWithValue("@x", MainWorldPosition?.World.Position.X ?? Transform.World.Position.X);
-                command.Parameters.AddWithValue("@y", MainWorldPosition?.World.Position.Y ?? Transform.World.Position.Y);
-                command.Parameters.AddWithValue("@z", MainWorldPosition?.World.Position.Z ?? Transform.World.Position.Z);
-                command.Parameters.AddWithValue("@roll", MainWorldPosition?.World.Rotation.X ?? Transform.World.Rotation.X);
-                command.Parameters.AddWithValue("@pitch", MainWorldPosition?.World.Rotation.Y ?? Transform.World.Rotation.Y);
-                command.Parameters.AddWithValue("@yaw", MainWorldPosition?.World.Rotation.Z ?? Transform.World.Rotation.Z);
+                // Position saving rule (portal / small world fix):
+                // MainWorldPosition is set when a player enters a system instance (dungeon /
+                // small world) and is used as the return point. The stock code preferred
+                // MainWorldPosition whenever it was non-null. The problem: MainWorldPosition
+                // stays non-null AFTER leaving an instance (it is reused by Return/portal
+                // logic), so once a player had visited an instance, every later save wrote the
+                // stale instance-return position instead of the player's real current position
+                // -- which teleported the player back to the exit portal on reconnect.
+                //
+                // Fix: only fall back to MainWorldPosition when the player is *currently* inside
+                // a non-default instance. When back in the main world, always save the live
+                // Transform.
+                var saveFromInstanceReturn =
+                    MainWorldPosition != null &&
+                    Transform.InstanceId != WorldManager.DefaultInstanceId;
+                command.Parameters.AddWithValue("@zone_id", saveFromInstanceReturn ? MainWorldPosition.ZoneId : Transform.ZoneId);
+                command.Parameters.AddWithValue("@x", saveFromInstanceReturn ? MainWorldPosition.World.Position.X : Transform.World.Position.X);
+                command.Parameters.AddWithValue("@y", saveFromInstanceReturn ? MainWorldPosition.World.Position.Y : Transform.World.Position.Y);
+                command.Parameters.AddWithValue("@z", saveFromInstanceReturn ? MainWorldPosition.World.Position.Z : Transform.World.Position.Z);
+                command.Parameters.AddWithValue("@roll", saveFromInstanceReturn ? MainWorldPosition.World.Rotation.X : Transform.World.Rotation.X);
+                command.Parameters.AddWithValue("@pitch", saveFromInstanceReturn ? MainWorldPosition.World.Rotation.Y : Transform.World.Rotation.Y);
+                command.Parameters.AddWithValue("@yaw", saveFromInstanceReturn ? MainWorldPosition.World.Rotation.Z : Transform.World.Rotation.Z);
                 command.Parameters.AddWithValue("@faction_id", Faction.Id);
                 command.Parameters.AddWithValue("@faction_name", FactionName);
                 command.Parameters.AddWithValue("@expedition_id", Expedition?.Id ?? 0);
@@ -2577,6 +2602,8 @@ public partial class Character : Unit, ICharacter
                 command.Parameters.AddWithValue("@jury_point", JuryPoint);
                 command.Parameters.AddWithValue("@hostile_faction_kills", HostileFactionKills);
                 command.Parameters.AddWithValue("@pvp_honor", HonorGainedInCombat);
+                command.Parameters.AddWithValue("@died_in_pvp", DiedInPvp);
+                command.Parameters.AddWithValue("@died_in_pvp_war_zone", DiedInPvpWarZone);
                 command.Parameters.AddWithValue("@delete_request_time", DeleteRequestTime);
                 command.Parameters.AddWithValue("@transfer_request_time", TransferRequestTime);
                 command.Parameters.AddWithValue("@delete_time", DeleteTime);

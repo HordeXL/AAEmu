@@ -27,6 +27,7 @@ using AAEmu.Game.Models.Game.World;
 using AAEmu.Game.Models.StaticValues;
 using AAEmu.Game.Models.Tasks.Skills;
 using AAEmu.Game.Utils;
+using static AAEmu.Game.Models.Game.Units.Buffs;
 
 namespace AAEmu.Game.Models.Game.Units;
 
@@ -227,6 +228,7 @@ public class Unit : BaseUnit, IUnit
     public DateTime SkillLastUsed { get; set; }
     public PlotState ActivePlotState { get; set; }
     public Dictionary<uint, List<Bonus>> Bonuses { get; set; }
+    public Dictionary<uint, List<DynamicBonus>> DynamicBonuses { get; set; }
     public UnitCooldowns Cooldowns { get; set; }
     public virtual Expedition Expedition { get; set; }
 
@@ -269,6 +271,7 @@ public class Unit : BaseUnit, IUnit
         Events = new UnitEvents();
         GcdLock = new object();
         Bonuses = [];
+        DynamicBonuses = [];
         IsInBattle = false;
         Equipment = new EquipmentContainer(0, SlotType.Equipment, false, this);
         ChargeLock = new object();
@@ -675,12 +678,64 @@ public class Unit : BaseUnit, IUnit
         return result;
     }
 
+    public override void AddDynamicBonus(uint bonusIndex, DynamicBonus bonus)
+    {
+        var bonuses = DynamicBonuses.TryGetValue(bonusIndex, out var bonusList) ? bonusList : [];
+        bonuses.Add(bonus);
+        DynamicBonuses[bonusIndex] = bonuses;
+    }
+
+    public override void RemoveDynamicBonus(uint bonusIndex, UnitAttribute attribute)
+    {
+        if (!DynamicBonuses.TryGetValue(bonusIndex, out var bonuses))
+        {
+            return;
+        }
+
+        foreach (var bonus in new List<DynamicBonus>(bonuses))
+        {
+            if (bonus.Template != null && bonus.Template.Attribute == attribute)
+            {
+                bonuses.Remove(bonus);
+            }
+        }
+
+        if (bonuses.Count == 0)
+        {
+            DynamicBonuses.Remove(bonusIndex);
+        }
+    }
+
+    public List<DynamicBonus> GetDynamicBonuses(UnitAttribute attribute)
+    {
+        var result = new List<DynamicBonus>();
+        if (DynamicBonuses == null)
+        {
+            return result;
+        }
+        foreach (var bonuses in new List<List<DynamicBonus>>(DynamicBonuses.Values))
+        {
+            foreach (var bonus in new List<DynamicBonus>(bonuses))
+            {
+                if (bonus.Template != null && bonus.Template.Attribute == attribute)
+                {
+                    result.Add(bonus);
+                }
+            }
+        }
+        return result;
+    }
+
     public double CalculateWithBonuses(double value, UnitAttribute attr)
     {
-        // Calculate flat values first, then percent values after that
+        // Order: static flat -> dynamic flat -> static percent -> dynamic percent.
+        // Dynamic bonuses are evaluated on the fly from their source buff so that time-varying
+        // modifiers (LinearFunc dynamic_unit_modifiers) reflect the current elapsed time rather
+        // than a value snapshotted at buff Start.
         var bonuses = GetBonuses(attr);
+        var dynamicBonuses = GetDynamicBonuses(attr);
 
-        // Flat values
+        // Static flat values
         foreach (var bonus in bonuses)
         {
             if (bonus.Template.ModifierType != UnitModifierType.Value)
@@ -688,12 +743,30 @@ public class Unit : BaseUnit, IUnit
             value += bonus.Value;
         }
 
-        // Percent Values
+        // Dynamic flat values
+        foreach (var dynamicBonus in dynamicBonuses)
+        {
+            if (dynamicBonus.Template.ModifierType != UnitModifierType.Value)
+                continue;
+            if (dynamicBonus.Evaluate(out var dynValue))
+                value += dynValue;
+        }
+
+        // Static percent values
         foreach (var bonus in bonuses)
         {
             if (bonus.Template.ModifierType != UnitModifierType.Percent)
                 continue;
             value += value * bonus.Value / 100f;
+        }
+
+        // Dynamic percent values
+        foreach (var dynamicBonus in dynamicBonuses)
+        {
+            if (dynamicBonus.Template.ModifierType != UnitModifierType.Percent)
+                continue;
+            if (dynamicBonus.Evaluate(out var dynValue))
+                value += value * dynValue / 100f;
         }
 
         return value;
@@ -968,8 +1041,7 @@ public class Unit : BaseUnit, IUnit
 
     public void UpdateGearBonuses(Item itemAdded, Item itemRemoved)
     {
-        // We use index 1 for gear bonuses. Will make this a constant later, or do it properly. Right now the expected behavior is to have key == buff id, which doesn't work when you have items.
-        Bonuses[1] = [];
+        Bonuses[GearBonusesIndex] = [];
 
         foreach (var item in Equipment.Items)
         {
@@ -978,12 +1050,12 @@ public class Unit : BaseUnit, IUnit
 
             // Mods on the gear Itself
             foreach (var template in ItemManager.Instance.GetUnitModifiers(item.TemplateId))
-                AddBonus(1, new Bonus { Template = template, Value = template.Value });
+                AddBonus(GearBonusesIndex, new Bonus { Template = template, Value = template.Value });
 
             // Mods from equipped Gems
             foreach (var gem in ei.GemIds)
                 foreach (var template in ItemManager.Instance.GetUnitModifiers(gem))
-                    AddBonus(1, new Bonus { Template = template, Value = template.Value });
+                    AddBonus(GearBonusesIndex, new Bonus { Template = template, Value = template.Value });
         }
 
         // Apply Equipment Effects
