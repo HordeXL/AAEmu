@@ -70,11 +70,16 @@ public class DamageEffect : EffectTemplate
         CastAction castObj, EffectSource source, SkillObject skillObject, DateTime time,
         CompressedGamePackets packetBuilder = null)
     {
-        Logger.Trace("DamageEffect");
-
         var trg = target as Unit;
         if (trg == null || trg.Hp <= 0)
         {
+            return;
+        }
+
+        // Null check here as for some reason, in rare occasions we get null as the caster here
+        if (caster == null)
+        {
+            Logger.Warn($"No caster defined for DamageEffect {Id}, with targetObjId {target.ObjId} ({target})");
             return;
         }
 
@@ -351,6 +356,7 @@ public class DamageEffect : EffectTemplate
         else if (!caster.CanAttack(trg))
             return;
 
+        // TODO: Set proper kill reason
         trg.ReduceCurrentHp(caster, value);
         ((Unit)caster).SummarizeDamage += value;
 
@@ -492,6 +498,29 @@ public class DamageEffect : EffectTemplate
             }
 
             trg.Buffs.TriggerRemoveOn(Buffs.BuffRemoveOn.DamagedEtc);
+        }
+
+        // Handle weapon durability
+        if (caster is Character player)
+        {
+            var durabilityLossTarget = DurabilityLossTargets.AllWeapons;
+            if (UseMainhandWeapon)
+                durabilityLossTarget = DurabilityLossTargets.PrimaryWeapon;
+            if (UseOffhandWeapon)
+                durabilityLossTarget = DurabilityLossTargets.SecondaryWeapon;
+            if (UseRangedWeapon)
+                durabilityLossTarget = DurabilityLossTargets.RangedWeapon;
+            
+            var durabilityRate = trg is Character ?
+                AppConfiguration.Instance.World.PvPDurabilityLossRate :
+                AppConfiguration.Instance.World.PvEDurabilityLossRate;
+
+            if (durabilityRate > 0f)
+            {
+                durabilityRate *= ItemManager.Instance.GetDurabilityDecrementChance();
+                // Take durability damage
+                player.ApplyDurabilityLossToEquipment(1, durabilityLossTarget, durabilityRate);
+            }
         }
     }
 }

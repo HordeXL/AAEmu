@@ -9,6 +9,7 @@ using AAEmu.Game.Core.Network.Game;
 using AAEmu.Game.Core.Packets.G2C;
 using AAEmu.Game.GameData;
 using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.DoodadObj;
 using AAEmu.Game.Models.Game.Expeditions;
 using AAEmu.Game.Models.Game.Gimmicks;
 using AAEmu.Game.Models.Game.Items;
@@ -446,13 +447,34 @@ public class Unit : BaseUnit, IUnit
         InterruptSkills();
 
         IsInBattle = false;
+        var killerUnit = killer as Unit;
+        var killerCharacter = killer as Character;
+        var thisCharacter = this as Character;
 
-        Events.OnDeath(this, new OnDeathArgs { Killer = (Unit)killer, Victim = this });
-        ParentWorld.Events.OnUnitKilled(ParentWorld, new OnUnitKilledArgs { Killer = (Unit)killer, Victim = this });
-        ((Unit)killer).Events.OnKill(this, new OnKillArgs { Killer = (Unit)killer, Victim = this });
+        Events.OnDeath(this, new OnDeathArgs { Killer = killerUnit, Victim = this });
+        ParentWorld.Events.OnUnitKilled(ParentWorld, new OnUnitKilledArgs { Killer = killerUnit, Victim = this });
+        killerUnit?.Events.OnKill(this, new OnKillArgs { Killer = killerUnit, Victim = this });
 
         Buffs.RemoveEffectsOnDeath();
-        killer.BroadcastPacket(new SCUnitDeathPacket(ObjId, killReason, (Unit)killer), true);
+
+        var lostExp = 0;
+        byte durabilityLoss = 0;
+        var resurrectWaitTime = 0;
+        // If this unit is a player and NOT killed by another player, then calculate xp loss.
+        // Only in main_world
+        if (thisCharacter is not null)
+        {
+            resurrectWaitTime = thisCharacter.RezWaitDuration;
+            lostExp = thisCharacter.LastExpLoss;
+            durabilityLoss = thisCharacter.LastDurabilityLoss;
+        }
+
+        if (this is Npc { Spawner: not null } thisNpc)
+        {
+            resurrectWaitTime = thisNpc.Spawner.RespawnTime;
+        }
+        
+        killer.BroadcastPacket(new SCUnitDeathPacket(ObjId, killReason, resurrectWaitTime, lostExp, durabilityLoss, killerUnit), true);
         if (killer == this)
         {
             switch (this)
@@ -475,7 +497,7 @@ public class Unit : BaseUnit, IUnit
         {
             killer.SendPacketToPlayers([this, killer], new SCAiAggroPacket(killer.ObjId, 0));
 
-            if (killer is Unit killerUnit)
+            if (killerUnit is not null)
             {
                 killerUnit.SummarizeDamage = 0;
                 if (killerUnit.CurrentTarget is Unit unitTarget)
@@ -488,21 +510,21 @@ public class Unit : BaseUnit, IUnit
             //killer.StartRegen();
             killer.BroadcastPacket(new SCTargetChangedPacket(killer.ObjId, 0), true);
 
-            if (killer is Character character)
+            if (thisCharacter is not null)
             {
-                StopAutoSkill(character);
-                character.IsInBattle = false; // we need the character to be "not in battle"
-                DespawnMate(character);
-            }
-            else if (((Unit)killer).CurrentTarget is Character character2)
-            {
-                StopAutoSkill(character2);
-                character2.IsInBattle = false; // we need the character to be "not in battle"
-                character2.DeadTime = DateTime.UtcNow;
-                DespawnMate(character2);
+                StopAutoSkill(thisCharacter);
+                thisCharacter.IsInBattle = false; // we need the character to be "not in battle"
+                thisCharacter.DeadTime = DateTime.UtcNow;
+                DespawnMate(thisCharacter);
             }
 
-            ((Unit)killer).CurrentTarget = null;
+            if (killerCharacter?.CurrentTarget == thisCharacter && thisCharacter is not null)
+            {
+                StopAutoSkill(killerCharacter);
+                killerCharacter.IsInBattle = false; // we need the character to be "not in battle"
+            }
+
+            killerUnit?.CurrentTarget = null;
         }
     }
 
@@ -926,7 +948,7 @@ public class Unit : BaseUnit, IUnit
     /// Set the faction of the owner
     /// </summary>
     /// <param name="factionId"></param>
-    public void SetFaction(FactionsEnum factionId)
+    public virtual void SetFaction(FactionsEnum factionId)
     {
         // Keep origin faction data temporarily for arena players
         OriginFaction = Faction;
@@ -947,6 +969,14 @@ public class Unit : BaseUnit, IUnit
             // BroadcastPacket(new SCUnitFactionChangedPacket(ObjId, Name, Faction?.Id ?? 0, factionId, false), true);
             Faction = FactionManager.Instance.GetFaction(factionId);
             BroadcastPacket(new SCUnitFactionChangedPacket(ObjId, Name, oldFactionId, Faction.Id, false), true);
+            if (Faction.Id == FactionsEnum.Pirate)
+            {
+                Buffs.AddBuff((uint)BuffConstants.Contemptuous, this);
+            }
+            else
+            {
+                Buffs.RemoveBuff((uint)BuffConstants.Contemptuous);
+            }
         }
 
         // TODO added for quest Id=2486
@@ -971,6 +1001,19 @@ public class Unit : BaseUnit, IUnit
         caster.ObjId = ObjId;
 
         var sct = SkillCastTarget.GetByType(SkillCastTargetType.Unit);
+        sct.ObjId = target.ObjId;
+
+        return skill.Use(this, caster, sct, null, true, out _);
+    }
+
+    public virtual SkillResult UseSkill(uint skillId, Doodad target)
+    {
+        var skill = new Skill(SkillManager.Instance.GetSkillTemplate(skillId));
+
+        var caster = SkillCaster.GetByType(SkillCasterType.Unit);
+        caster.ObjId = ObjId;
+
+        var sct = SkillCastTarget.GetByType(SkillCastTargetType.Doodad);
         sct.ObjId = target.ObjId;
 
         return skill.Use(this, caster, sct, null, true, out _);
@@ -1050,6 +1093,9 @@ public class Unit : BaseUnit, IUnit
         foreach (var item in Equipment.Items)
         {
             if (item is not EquipItem ei)
+                continue;
+            
+            if (!ei.IsNotDestroyed)
                 continue;
 
             // Mods on the gear Itself
@@ -1176,6 +1222,12 @@ public class Unit : BaseUnit, IUnit
     {
         if ((itemAdded != null || itemRemoved != null) && itemAdded is not Items.Armor && itemRemoved is not Items.Armor)
             return;
+
+        if (itemAdded is EquipItem { MaxDurability: > 0, Durability: <= 0 })
+        {
+            // Destroyed item, ignore
+            return;
+        }
 
         // Clear any existing armor grade buffs
         Buffs.RemoveBuffs((uint)BuffConstants.ArmorBuffTag, 10);
@@ -1309,55 +1361,64 @@ public class Unit : BaseUnit, IUnit
 
         if (itemAdded != null)
         {
-            // Static Buffs
-            var itemAddedBuff = ItemGameData.Instance.GetItemBuff(itemAdded.TemplateId, itemAdded.Grade) ?? SkillManager.Instance.GetBuffTemplate(itemAdded.Template.BuffId);
-            if (itemAddedBuff != null) // add buff from equipped item
+            if (itemAdded is EquipItem { MaxDurability: > 0, Durability: <= 0 })
             {
-                var newEffect =
-                    new Buff(this, this, new SkillCasterUnit(), itemAddedBuff, null, DateTime.UtcNow)
-                    {
-                        AbLevel = (uint)itemAdded.Template.Level
-                    };
-
-                Buffs.AddBuff(newEffect);
+                // Destroyed item, ignore
             }
-
-            // Charged Item Buffs
-            if (itemAdded is EquipItem equipItem && equipItem.Template is EquipItemTemplate equipItemTemplate &&
-                equipItemTemplate.RechargeBuffId > 0)
+            else
             {
-                var addChargeBuff = false;
-                var checkExpireTime = equipItemTemplate.BindType.HasFlag(ItemBindType.BindOnUnpack)
-                    ? equipItem.UnpackTime
-                    : equipItem.ChargeStartTime;
-                checkExpireTime = checkExpireTime.AddMinutes(equipItemTemplate.ChargeLifetime);
-
-                // Check against timer
-                if (equipItemTemplate.ChargeLifetime > 0 && checkExpireTime > DateTime.UtcNow)
-                    addChargeBuff = true;
-
-                // Check against charge counter
-                if (equipItemTemplate.ChargeCount > 0 && equipItem.ChargeCount > 0)
-                    addChargeBuff = true;
-
-                // If this item is Bind on unwrap, don't start the buff if it's not unwrapped
-                if (equipItemTemplate.BindType.HasFlag(ItemBindType.BindOnUnpack) && equipItem.HasFlag(ItemFlag.Unpacked) == false)
-                    addChargeBuff = false;
-
-                if (addChargeBuff)
+                // Static Buffs
+                var itemAddedBuff = ItemGameData.Instance.GetItemBuff(itemAdded.TemplateId, itemAdded.Grade) ??
+                                    SkillManager.Instance.GetBuffTemplate(itemAdded.Template.BuffId);
+                if (itemAddedBuff != null) // add buff from equipped item
                 {
-                    var itemAddedChargedBuff = SkillManager.Instance.GetBuffTemplate(equipItemTemplate.RechargeBuffId);
                     var newEffect =
-                        new Buff(this, this, new SkillCasterUnit(), itemAddedChargedBuff, null, DateTime.UtcNow)
+                        new Buff(this, this, new SkillCasterUnit(), itemAddedBuff, null, DateTime.UtcNow)
                         {
                             AbLevel = (uint)itemAdded.Template.Level
                         };
+
                     Buffs.AddBuff(newEffect);
                 }
+
+                // Charged Item Buffs
+                if (itemAdded is EquipItem equipItem && equipItem.Template is EquipItemTemplate equipItemTemplate &&
+                    equipItemTemplate.RechargeBuffId > 0)
+                {
+                    var addChargeBuff = false;
+                    var checkExpireTime = equipItemTemplate.BindType.HasFlag(ItemBindType.BindOnUnpack)
+                        ? equipItem.UnpackTime
+                        : equipItem.ChargeStartTime;
+                    checkExpireTime = checkExpireTime.AddMinutes(equipItemTemplate.ChargeLifetime);
+
+                    // Check against timer
+                    if (equipItemTemplate.ChargeLifetime > 0 && checkExpireTime > DateTime.UtcNow)
+                        addChargeBuff = true;
+
+                    // Check against charge counter
+                    if (equipItemTemplate.ChargeCount > 0 && equipItem.ChargeCount > 0)
+                        addChargeBuff = true;
+
+                    // If this item is Bind on unwrap, don't start the buff if it's not unwrapped
+                    if (equipItemTemplate.BindType.HasFlag(ItemBindType.BindOnUnpack) &&
+                        equipItem.HasFlag(ItemFlag.Unpacked) == false)
+                        addChargeBuff = false;
+
+                    if (addChargeBuff)
+                    {
+                        var itemAddedChargedBuff =
+                            SkillManager.Instance.GetBuffTemplate(equipItemTemplate.RechargeBuffId);
+                        var newEffect =
+                            new Buff(this, this, new SkillCasterUnit(), itemAddedChargedBuff, null, DateTime.UtcNow)
+                            {
+                                AbLevel = (uint)itemAdded.Template.Level
+                            };
+                        Buffs.AddBuff(newEffect);
+                    }
+                }
+
+                // Unit_Modifiers from items
             }
-
-            // Unit_Modifiers from items
-
         }
 
         if (itemAdded == null && itemRemoved == null) // This is the first load check to apply buffs for equipped items. 
@@ -1576,7 +1637,7 @@ public class Unit : BaseUnit, IUnit
                 {
                     if (!player.Quests.IsQuestComplete(npc.Template.EngageCombatGiveQuestId) &&
                         !player.Quests.HasQuest(npc.Template.EngageCombatGiveQuestId))
-                        player.Quests.AddQuest(npc.Template.EngageCombatGiveQuestId);
+                        player.Quests.AddQuestFromNpc(npc.Template.EngageCombatGiveQuestId, npc.ObjId);
                 }
             }
 

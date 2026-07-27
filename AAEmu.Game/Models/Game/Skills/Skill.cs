@@ -97,6 +97,9 @@ public class Skill
 
         // Cast character for future reference
         var character = caster as Character;
+        var cooldownOwner = character ?? caster.GetOwnerCharacter();
+        if (character != null)
+            character.SkillCancelled = false;
 
         unit.ConditionChance = true;
 
@@ -108,6 +111,12 @@ public class Skill
             Cancelled = true;
             skillResultValueUInt = requirementResult.ResultUInt;
             return SkillResultHelper.SkillResultErrorKeyToId(requirementResult.ResultKey);
+        }
+
+        if (Template.CooldownTime > 0 && cooldownOwner is { IgnoreSkillCooldowns: false } && unit.Cooldowns.CheckCooldown(Template.Id))
+        {
+            Logger.Trace($"Skill: CooldownTime [{Template.CooldownTime}]!");
+            return SkillResult.CooldownTime;
         }
 
         _bypassGcd = bypassGcd;
@@ -282,7 +291,7 @@ public class Skill
                 }
 
                 // copy OpenPortalEffect.cs
-                var portalInfo = (SkillObjectUnk1)skillObject;
+                var portalInfo = (SkillObjectPortalInfo)skillObject;
                 trp = character.Portals.GetPortalInfo((uint)portalInfo.Id);
             }
 
@@ -987,6 +996,29 @@ public class Skill
                     }
                 }
                 HitTypes.TryAdd(targetUnit.ObjId, diceResult);
+                
+                // There's probably a better place to handle parry/block durability, but let's put it here for now
+                if (targetUnit is Character targetPlayer)
+                {
+                    var durabilityLossRate = caster is Character
+                        ? AppConfiguration.Instance.World.PvPDurabilityLossRate
+                        : AppConfiguration.Instance.World.PvEDurabilityLossRate;
+                    durabilityLossRate *= ItemManager.Instance.GetDurabilityDecrementChance();
+                    if (durabilityLossRate > 0)
+                    {
+                        switch (diceResult)
+                        {
+                            case SkillHitType.MeleeBlock:
+                            case SkillHitType.RangedBlock:
+                                targetPlayer.ApplyDurabilityLossToEquipment(1, DurabilityLossTargets.Shield, durabilityLossRate);
+                                break;
+                            case SkillHitType.RangedParry:
+                            case SkillHitType.MeleeParry:
+                                targetPlayer.ApplyDurabilityLossToEquipment(1, DurabilityLossTargets.AllMainWeapons, durabilityLossRate);
+                                break;
+                        }
+                    }
+                }
             }
             else if (target is Doodad doodad)
             {
@@ -1296,9 +1328,10 @@ public class Skill
             // Related skill Discard Portable Harpoon Cannon (skill 17735) has no reagents attached
             // The item however is marked with use_skill_as_reagent, so if it requires reagent according to the item
             // but has none attached, consume 1 of the source item instead
+            // 2026-07-15 - Added an additional check if the skill has no effects of it's own. This fixed the bug with Wrapped Sugerplum Fairy Music Box (27627) unwrapping
             // TODO: Check if this is intended behaviour, or if this is a bug in the compact.sqlite3 file
             var item = ItemManager.Instance.GetItemByItemId(skillItem.ItemId);
-            if (item?.Template.UseSkillAsReagent == true && reagents.Count <= 0 && skillProducts.Count <= 0 && consumedItems.Count <= 0)
+            if (item?.Template.UseSkillAsReagent == true && reagents.Count <= 0 && skillProducts.Count <= 0 && consumedItems.Count <= 0 && Template.Effects.Count == 0)
             {
                 consumedItems.Add((item, 1));
                 Logger.Debug($"Consumed item template 1 x {item.TemplateId} ({item.Id}) because of missing reagent information with skill {Template.Id}");
@@ -1385,8 +1418,11 @@ public class Skill
         SkillTlIdManager.ReleaseId(TlId);
         TlId = 0;
 
-        if (caster is Character character1 && character1.IgnoreSkillCooldowns)
-            character1.ResetSkillCooldown(Template.Id, false);
+        if (caster.GetOwnerCharacter() is { IgnoreSkillCooldowns: true } cooldownOwner)
+        {
+            cooldownOwner.ResetSkillCooldown(Template.Id, false);
+            unit.Cooldowns.RemoveCooldown(Template.Id);
+        }
     }
 
     /// <summary>
@@ -1415,8 +1451,11 @@ public class Skill
         SkillTlIdManager.ReleaseId(TlId);
         TlId = 0;
 
-        if (caster is Character character && character.IgnoreSkillCooldowns)
+        if (caster.GetOwnerCharacter() is { IgnoreSkillCooldowns: true } character)
+        {
             character.ResetSkillCooldown(Template.Id, false);
+            unit.Cooldowns.RemoveCooldown(Template.Id);
+        }
     }
 
     public SkillHitType RollCombatDice(BaseUnit attacker, BaseUnit target)
@@ -1454,7 +1493,7 @@ public class Skill
                 if (damageType == DamageType.Ranged)
                     return SkillHitType.RangedBlock;
             }
-            if (Target != null && Random.Shared.Next(0F, 100f) < Target.MeleeParryRate - bullsEyeMod)
+            if (Target != null && Random.Shared.Next(0f, 100f) < Target.MeleeParryRate - bullsEyeMod)
             {
                 if (damageType == DamageType.Melee)
                     return SkillHitType.MeleeParry;

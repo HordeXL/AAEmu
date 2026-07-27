@@ -12,6 +12,7 @@ public enum ErrorMessageType : short
     NoPermissionToLoot = 6,												// "no_permission_to_loot";
     CannotHarvestYet = 7,												// "尚不能采集";
     WaterItemNeeded = 8,												// "需要水物品";
+    /// <summary>Not enough labor</summary>
     LaborPowerNeeded = 9,												// "需要劳动力";
     SeedItemNeeded = 10,												// "需要种子物品";
     NeedToLearnInteraction = 11,										// "需要学习互动";
@@ -32,6 +33,7 @@ public enum ErrorMessageType : short
     NotEnoughMoney = 26,												// "金钱不足";
     NotEnoughItem = 27,													// "not_enough_item";
     NotEnoughFriendship = 28,											// "好感度不足";
+    /// <summary>Don't have any labor</summary>
     NotEnoughLaborPower = 29,											// "劳动力不足";
     ItemUpdateFail = 30,												// "物品更新失败";
     FactionDuplicateName = 31,											// "faction_duplicate_name";

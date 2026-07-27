@@ -20,7 +20,7 @@ using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.StaticValues;
 using AAEmu.Game.Models.Tasks.Item;
 using AAEmu.Game.Utils.DB;
-
+using Microsoft.Data.Sqlite;
 using MySql.Data.MySqlClient;
 
 using NLog;
@@ -200,6 +200,11 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
         return _itemCapScales.GetValueOrDefault(skillId);
     }
 
+    public float GetDurabilityDecrementChance()
+    {
+        return _config.DurabilityDecrementChance;
+    }
+
     public float GetDurabilityRepairCostFactor()
     {
         return _config.DurabilityRepairCostFactor;
@@ -218,6 +223,11 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
     public float GetWearableDurabilityConst()
     {
         return _config.WearableDurabilityConst;
+    }
+
+    public byte GetDeathDurabilityLossRatio()
+    {
+        return _config.DeathDurabilityLossRatio;
     }
 
     public float GetItemStatConst()
@@ -400,7 +410,9 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
         return true;
     }
 
-    public void Load()
+    public void Load() => Load(SQLite.CreateConnection());
+
+    public void Load(SqliteConnection connection)
     {
         if (_loaded)
             return;
@@ -442,7 +454,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
         LastTimerCheck = DateTime.UtcNow;
 
         skillManager.OnSkillsLoaded += OnSkillsLoaded;
-        using (var connection = SQLite.CreateConnection())
+        // using (var connection = SQLite.CreateConnection())
         {
             Logger.Info("正在加载物品模板 ...");
 
@@ -461,7 +473,7 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                     _config.DurabilityConst = reader.GetFloat("durability_const");
                     _config.HoldableDurabilityConst = reader.GetFloat("holdable_durability_const");
                     _config.WearableDurabilityConst = reader.GetFloat("wearable_durability_const");
-                    _config.DeathDurabilityLossRatio = reader.GetInt32("death_durability_loss_ratio");
+                    _config.DeathDurabilityLossRatio = reader.GetByte("death_durability_loss_ratio");
                     _config.ItemStatConst = reader.GetInt32("item_stat_const");
                     _config.HoldableStatConst = reader.GetInt32("holdable_stat_const");
                     _config.WearableStatConst = reader.GetInt32("wearable_stat_const");

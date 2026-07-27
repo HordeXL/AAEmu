@@ -7,6 +7,7 @@ using AAEmu.Game.Core.Packets.G2C;
 using AAEmu.Game.Models.Game.DoodadObj.Static;
 using AAEmu.Game.Models.Game.Faction;
 using AAEmu.Game.Models.Game.Items;
+using AAEmu.Game.Models.Game.Items.Actions;
 using AAEmu.Game.Models.Game.Items.Templates;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Skills.Effects;
@@ -34,8 +35,6 @@ public partial class Character
 
     public uint ResurrectHpPercent { get; set; } = 1;
     public uint ResurrectMpPercent { get; set; } = 1;
-    public uint HostileFactionKills { get; set; }
-    public uint HonorGainedInCombat { get; set; }
 
     /// <summary>True if last death was a PvP kill in a War zone (Leech debuff on temple-revive).</summary>
     public bool DiedInPvpWarZone { get; set; }
@@ -64,7 +63,51 @@ public partial class Character
         // Escalating respawn timer — runs BEFORE base.DoDie sends SCUnitDeathPacket
         ComputeDeathWaitTime();
 
+        LastDurabilityLoss = Level >= AppConfiguration.Instance.World.MinimumExpLossLevel
+            ? ItemManager.Instance.GetDeathDurabilityLossRatio()
+            : (byte)0;
+
+        if (Level < ExperienceManager.Instance.MaxPlayerLevel && ParentWorld.Id == WorldManager.DefaultInstanceId)
+        {
+            if (Level >= AppConfiguration.Instance.World.MinimumExpLossLevel)
+            {
+                LastExpLoss = ExperienceManager.Instance.GetExpLoss(Level, AppConfiguration.Instance.World.ExpLossRateAtDeath);
+                var thisLevelStartExp = ExperienceManager.Instance.GetExpForLevel(Level);
+                var inThisLevelExp = Experience - thisLevelStartExp;
+                LastExpLoss = Math.Min(LastExpLoss, inThisLevelExp);
+                RecoverableExp = (int)Math.Round(LastExpLoss * 0.80f);
+                SendDebugMessage($"Lost {LastExpLoss} exp, {LastDurabilityLoss} Durability. Can recover {RecoverableExp} exp");
+            }
+            else
+            {
+                // Free resurrect below level 10 
+                SendPacket(new SCNotifyResurrectionPacket(new SkillCasterUnit(ObjId)));
+                SendDebugMessage($"Free resurrect below level {AppConfiguration.Instance.World.MinimumExpLossLevel}");
+            }
+        }
+        else
+        {
+            LastExpLoss = 0;
+            SendDebugMessage($"No Exp Lost at max level, Lost {LastDurabilityLoss} Durability.");
+        }
+
+        if (LastExpLoss > 0 || RecoverableExp > 0)
+        {
+            Experience -= LastExpLoss;
+            SendPacket(new SCRecoverableExpPacket(ObjId, RecoverableExp, LastExpLoss, (int)KillReason.Damage));
+            if (LastExpLoss > 0)
+            {
+                SendPacket(new SCExpChangedPacket(ObjId, -LastExpLoss, false));
+            }
+        }
+
         base.DoDie(killer, killReason);
+
+        if (LastDurabilityLoss > 0)
+        {
+            ApplyDurabilityLossToEquipment(LastDurabilityLoss, DurabilityLossTargets.All, -1f);
+            LastDurabilityLoss = 0;
+        }
 
         // Resolve the victim's zone-conflict state once for both PvP-honor award and War-zone honor-loss
         var victimZone = ZoneManager.Instance.GetZoneByKey(Transform.ZoneId);
@@ -74,8 +117,12 @@ public partial class Character
         var zoneState = conflictData?.CurrentZoneState ?? ZoneConflictType.Peace;
 
         var relationState = killer.GetRelationStateTo(this);
+        var possibleArrest = false;
+        Character arrestor = null;
         if (killer is Character enemy)
         {
+            possibleArrest = true;
+            arrestor = enemy;
             if (relationState != RelationState.Friendly)
             {
                 enemy.HostileFactionKills++;
@@ -103,7 +150,9 @@ public partial class Character
                 // Friendly-fire kill → generate crime evidence (unless retaliation)
                 var killerOwner = killer.GetOwnerCharacter();
                 if (killerOwner != null && !AssaultedBy.Contains(killerOwner.Id))
+                {
                     _ = CrimeManager.Instance.GenerateEvidenceFromKill(killer, this);
+                }
             }
         }
 
@@ -112,6 +161,21 @@ public partial class Character
 
         // Clear damage history on death (heal history is intentionally kept)
         _pvpDamageHistory.Clear();
+
+        // Arrest if wanted
+        if (possibleArrest && Buffs.CheckBuffTag((uint)BuffConstants.TagWanted))
+        {
+            if (!Buffs.CheckBuff((uint)BuffConstants.Contemptuous))
+            {
+                // If not a pirate arrest regardless
+                TrialManager.Instance.ArrestCriminal(this, arrestor);
+            }
+            else if (!ZoneManager.Instance.IsPirateDesperadoZone(Transform.ZoneId))
+            {
+                // If a pirate, only arrest in faction zones
+                TrialManager.Instance.ArrestCriminal(this, arrestor);
+            }
+        }
     }
 
     /// <summary>
@@ -352,7 +416,7 @@ public partial class Character
     public void CheckWantedThreshold()
     {
         // Check wanted status
-        if (CrimeRecord >= CrimeManager.PirateCrimePointThreshold)
+        if (InfamyPoint >= CrimeManager.PirateCrimePointThreshold)
         {
             // Add wanted
             if (!Buffs.CheckBuff((uint)BuffConstants.Wanted))
@@ -367,30 +431,158 @@ public partial class Character
             if (Faction.Id != FactionsEnum.Pirate)
             {
                 SetFaction(FactionsEnum.Pirate);
-                if (Expedition != null && Expedition.MotherId != FactionsEnum.Pirate)
-                {
-                    ExpeditionManager.Instance.Kick(this.Connection, this.Id);
-                }
-                if (InParty)
-                {
-                    TeamManager.Instance.MemberRemoveFromTeam(this, this, RiskyAction.Kick);
-                }
-            }
-        }
-        else
-        if (CrimePoint >= CrimeManager.WantedCrimePointThreshold)
-        {
-            if (!Buffs.CheckBuff((uint)BuffConstants.Wanted))
-            {
-                Buffs.AddBuff((uint)BuffConstants.Wanted, this);
             }
         }
         else
         {
-            if (Buffs.CheckBuff((uint)BuffConstants.Wanted))
+            if (CrimePoint >= CrimeManager.WantedCrimePointThreshold)
             {
-                Buffs.RemoveBuff((uint)BuffConstants.Wanted);
+                if (!Buffs.CheckBuff((uint)BuffConstants.Wanted))
+                {
+                    Buffs.AddBuff((uint)BuffConstants.Wanted, this);
+                }
+            }
+            else
+            {
+                if (Buffs.CheckBuff((uint)BuffConstants.Wanted))
+                {
+                    Buffs.RemoveBuff((uint)BuffConstants.Wanted);
+                }
+            }
+            // Remove pirate buff if on
+            if (Buffs.CheckBuff((uint)BuffConstants.Contemptuous))
+            {
+                Buffs.RemoveBuff((uint)BuffConstants.Contemptuous);
             }
         }
     }
+
+    /// <summary>
+    /// Applied durability loss to items, sends related packets and updates bonuses if needed
+    /// </summary>
+    /// <param name="durabilityLoss"></param>
+    /// <param name="targets"></param>
+    /// <param name="durabilityRate">Percent value that an item can lose the durability, if set to &lt; 0, it will affect all target items</param>
+    public void ApplyDurabilityLossToEquipment(byte durabilityLoss, DurabilityLossTargets targets, float durabilityRate)
+    {
+        var updateTasks = new List<ItemTask>();
+        var destroyedItems = new List<Item>();
+        foreach (var item in Equipment.Items)
+        {
+            if (item is not EquipItem equipItem)
+                continue;
+
+            // Ignore if no durability
+            if (equipItem.MaxDurability <= 0)
+                continue;
+
+            // Ignore already destroyed items
+            if (!equipItem.IsNotDestroyed)
+                continue;
+
+            // Filter out by type
+            switch (targets)
+            {
+                case DurabilityLossTargets.All:
+                    // No filter, normally only used for player death
+                    break;
+                case DurabilityLossTargets.AllArmor:
+                    if (equipItem is not Items.Armor)
+                        continue;
+                    break;
+                case DurabilityLossTargets.AllWeapons:
+                    if (equipItem is not Weapon)
+                        continue;
+                    break;
+                case DurabilityLossTargets.AllMainWeapons:
+                    if (equipItem is not Weapon || (equipItem.Slot != (int)EquipmentItemSlot.Mainhand && equipItem.Slot != (int)EquipmentItemSlot.Offhand))
+                        continue;
+                    break;
+                case DurabilityLossTargets.PrimaryWeapon:
+                    if (equipItem.Slot != (int)EquipmentItemSlot.Mainhand)
+                        continue;
+                    break;
+                case DurabilityLossTargets.SecondaryWeapon:
+                    if (equipItem.Slot != (int)EquipmentItemSlot.Offhand)
+                        continue;
+                    break;
+                case DurabilityLossTargets.RangedWeapon:
+                    if (equipItem.Slot != (int)EquipmentItemSlot.Ranged)
+                        continue;
+                    break;
+                case DurabilityLossTargets.Shield:
+                    if (equipItem.Template is not WeaponTemplate shieldHoldable || shieldHoldable.HoldableTemplate.SlotTypeId != (uint)EquipmentItemSlotType.Shield)
+                        continue;
+                    break;
+                case DurabilityLossTargets.Feet:
+                    if (equipItem.Slot != (int)EquipmentItemSlot.Feet)
+                        continue;
+                    break;
+                default:
+                    continue;
+            }
+
+            // If durability rate is set, apply randomness
+            if (durabilityRate >= 0f && ((Random.Shared.NextSingle() * 100f) > durabilityRate))
+            {
+                // random did not qualify for durability loss
+                continue;
+            }
+
+            // Deduct durability
+            if (equipItem.Durability <= durabilityLoss)
+            {
+                // Destroyed item
+                equipItem.Durability = 0;
+                destroyedItems.Add(equipItem);
+                SendDebugMessage($"Equipment Item: {equipItem.Id} @ITEM_NAME({equipItem.TemplateId}) ({equipItem.TemplateId}) was |cFFFF0000destroyed|r");
+            }
+            else
+            {
+                equipItem.Durability -= durabilityLoss;
+                SendDebugMessage($"Equipment Item: {equipItem.Id} @ITEM_NAME({equipItem.TemplateId}) ({equipItem.TemplateId}) lost {durabilityLoss} durability");
+            }
+
+            equipItem.IsDirty = true;
+            updateTasks.Add(new ItemUpdate(equipItem));
+        }
+
+        if (updateTasks.Count > 0)
+        {
+            // NOTE: Max 30 items, but technically speaking, you should never be able to reach that amount
+            // since you can not have that many items that have durability equipped at the same time.
+            SendPacket(new SCItemTaskSuccessPacket(ItemTaskType.DurabilityLoss, updateTasks, null));
+        }
+
+        // Reparse equipment buffs if needed because of getting destroyed items
+        if (destroyedItems.Count > 0)
+        {
+            foreach (var item in destroyedItems)
+            {
+                UpdateGearBonuses(null, item);
+            }
+        }
+    }
+}
+
+public enum DurabilityLossTargets
+{
+    /// <summary>Applies to all equipped items</summary>
+    All,
+    /// <summary>Only armor pieces</summary>
+    AllArmor,
+    /// <summary>Only weapons and shields</summary>
+    AllWeapons,
+    /// <summary>Only the main and offhand equipped slots</summary>
+    AllMainWeapons,
+    /// <summary>Only the equipped main weapon</summary>
+    PrimaryWeapon,
+    /// <summary>Only the equipped offhand weapon or shield</summary>
+    SecondaryWeapon,
+    /// <summary>Only the weapon in the ranged slot </summary>
+    RangedWeapon,
+    /// <summary>Only aplly to shields</summary>
+    Shield,
+    /// <summary>Only apply to feet (if you want to implement wear by walk distance for example)</summary>
+    Feet
 }

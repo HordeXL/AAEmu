@@ -19,7 +19,7 @@ public class TestChatChannel : ICommand
 
     public string GetCommandLineHelp()
     {
-        return "<list||clean||<<join||leave> <chatTypeId> <chatSubType> <chatFaction>>";
+        return "<list [id]||clean||<<join||leave> <chatTypeId> <chatSubType> <chatFaction>>";
     }
 
     public string GetCommandHelpText()
@@ -36,11 +36,58 @@ public class TestChatChannel : ICommand
             var channels = ChatManager.Instance.ListAllChannels();
             foreach (var c in channels)
             {
+                var memberCount = c.GetMembersSnapshot().Length;
                 CommandManager.SendNormalText(this, messageOutput,
-                    $"T:{c.ChatType} ST:{c.SubType} F:{c.Faction} => {c.InternalId} - {c.InternalName} ({c.Members.Count})");
+                    $"{c.InternalId} - T:{c.ChatType} ST:{c.SubType} F:{c.Faction} => {c.InternalName} ({memberCount})");
             }
 
             CommandManager.SendNormalText(this, messageOutput, $"列表结束");
+            return;
+        }
+
+        if (args.Length == 2 && args[0].Equals("list", StringComparison.CurrentCultureIgnoreCase))
+        {
+            if (!uint.TryParse(args[1], out var channelId))
+            {
+                CommandManager.SendErrorText(this, messageOutput, $"ChannelId Parse error");
+                return;
+            }
+            var thisChannel = ChatManager.Instance.ListAllChannels().FirstOrDefault(x => x.InternalId == channelId);
+            if (thisChannel == null)
+            {
+                CommandManager.SendErrorText(this, messageOutput, $"ChannelId {channelId} not found");
+                return;
+            }
+            var members = thisChannel.GetMembersSnapshot();
+            CommandManager.SendNormalText(this, messageOutput, $"List {members.Length} members of {thisChannel.InternalName} ({thisChannel.InternalId})");
+            var t = string.Empty;
+            var c = 0;
+            var first = true;
+            foreach (var m in members)
+            {
+                if (first)
+                {
+                    first = false;
+                    t += m.Name;
+                }
+                else
+                {
+                    t += $", {m.Name}";
+                }
+
+                c++;
+                if (c >= 10)
+                {
+                    CommandManager.SendNormalText(this, messageOutput, $"{t}");
+                    c = 0;
+                }
+            }
+
+            if (c > 0)
+            {
+                CommandManager.SendNormalText(this, messageOutput, $"{t}");
+            }
+            CommandManager.SendNormalText(this, messageOutput, $"End of list");
             return;
         }
 
@@ -59,7 +106,7 @@ public class TestChatChannel : ICommand
 
         if (!Enum.TryParse<ChatType>(args[1], true, out var chatType) ||
             !byte.TryParse(args[2], out var chatSubType) ||
-            !Enum.TryParse<FactionsEnum>(args[1], true, out var chatFaction)
+            !Enum.TryParse<FactionsEnum>(args[3], true, out var chatFaction)
            )
         {
             CommandManager.SendErrorText(this, messageOutput, $"解析错误");

@@ -319,7 +319,7 @@ public class PortalManager(ILocalizationManager localizationManager, IWorldManag
     /// <param name="portalInfo"></param>
     /// <param name="portalEffectObj"></param>
     /// <returns></returns>
-    private Models.Game.Units.Portal MakePortal(Unit owner, bool isExit, Portal portalInfo, SkillObjectUnk1 portalEffectObj)
+    private Models.Game.Units.Portal MakePortal(Unit owner, bool isExit, Portal portalInfo, SkillObjectPortalInfo portalEffectObj)
     {
         // 3891 - Portal Entrance
         // 6949 - Portal Exit
@@ -372,7 +372,7 @@ public class PortalManager(ILocalizationManager localizationManager, IWorldManag
         return portalNpc;
     }
 
-    public void OpenPortal(Character owner, SkillObjectUnk1 portalEffectObj)
+    public void OpenPortal(Character owner, SkillObjectPortalInfo portalEffectObj)
     {
         var portalInfo = owner.Portals.GetPortalInfo((uint)portalEffectObj.Id);
         if (!CheckCanOpenPortal(owner, portalInfo.ZoneId)) return;
@@ -397,11 +397,28 @@ public class PortalManager(ILocalizationManager localizationManager, IWorldManag
             return;
         }
 
+        if (TrialManager.Instance.IsPlayerInCourt(character.Id))
+        {
+            character.SendErrorMessage(ErrorMessageType.CannotUsePortalInTrial);
+            return;
+        }
+
         character.DisabledSetPosition = true;
         // TODO - UnitPortalUsed
         // TODO - Maybe need unitState?
         if (portalInfo.TeleportPosition.InstanceId != character.Transform.InstanceId)
         {
+            var slaveManager = character.ParentWorld?.SlaveManager;
+            var activeSlave = slaveManager?.GetActiveSlaveByOwnerObjId(character.ObjId);
+            if (activeSlave?.AttachedDoodads.Any(doodad => doodad.ItemId != 0 || doodad.ItemTemplateId != 0) == true)
+            {
+                character.SendErrorMessage(ErrorMessageType.SlaveEquipmentLoadedItem);
+                return;
+            }
+
+            character.ParentWorld?.MateManager?.RemoveAndDespawnAllActiveOwnedMates(character);
+            slaveManager?.RemoveAndDespawnAllActiveOwnedSlaves(character);
+
             character.SendPacket(
                 new SCLoadInstancePacket(
                     portalInfo.TeleportPosition.WorldId,

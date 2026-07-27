@@ -1,8 +1,10 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using AAEmu.Commons.Utils;
+using AAEmu.Game.Core.Managers.Id;
 using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Chat;
+using AAEmu.Game.Models.Game.Crime;
 using AAEmu.Game.Models.Game.Expeditions;
 using AAEmu.Game.Models.Game.Team;
 using AAEmu.Game.Models.StaticValues;
@@ -26,6 +28,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     private ConcurrentDictionary<long, ChatChannel> RaidChannels { get; }= new();
     private ConcurrentDictionary<FactionsEnum, ChatChannel> GuildChannels { get; }= new();
     private ConcurrentDictionary<long, ChatChannel> FamilyChannels { get; } = new();
+    private ConcurrentDictionary<CourtRoomRegion, ChatChannel> CourtRoomChannels { get; } = new();
 
     /// <summary>
     /// Creates default channels
@@ -43,6 +46,10 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         // Create Nation Channels
         _ = AddNationChannel(Race.Nuian, FactionsEnum.NuiaAlliance, "努伊安 - 精灵 - 矮人");
         _ = AddNationChannel(Race.Hariharan, FactionsEnum.HaranyaAlliance, "哈拉尼 - 菲尔 - 战生");
+        
+        // Jury Channels
+        _ = AddTrialChatChannel(CourtRoomRegion.Nuian, FactionsEnum.NuiaAlliance, "Nuian Court");
+        _ = AddTrialChatChannel(CourtRoomRegion.Haranyan, FactionsEnum.HaranyaAlliance, "Haranyan Court");
 
         // Zone, Party/Raid, Guild, Family channels are created on the fly
     }
@@ -59,6 +66,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
         };
         res.AddRange(FactionChannels.Values);
         res.AddRange(NationChannels.Values);
+        res.AddRange(CourtRoomChannels.Values);
         res.AddRange(ZoneChannels.Values);
         res.AddRange(PartyChannels.Values);
         res.AddRange(RaidChannels.Values);
@@ -74,6 +82,8 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     public void LeaveAllChannels(Character character)
     {
         foreach (var c in FactionChannels)
+            c.Value?.LeaveChannel(character);
+        foreach (var c in CourtRoomChannels)
             c.Value?.LeaveChannel(character);
         foreach (var c in NationChannels)
             c.Value?.LeaveChannel(character);
@@ -94,37 +104,32 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     /// </summary>
     public int CleanUpChannels()
     {
+        return CleanUpChannels(ZoneChannels)
+               + CleanUpChannels(PartyChannels)
+               + CleanUpChannels(RaidChannels)
+               + CleanUpChannels(GuildChannels)
+               + CleanUpChannels(FamilyChannels);
+    }
+
+    private static int CleanUpChannels<TKey>(ConcurrentDictionary<TKey, ChatChannel> channels)
+        where TKey : notnull
+    {
         var res = 0;
-        foreach (var c in ZoneChannels)
-            if (c.Value.Members.Count <= 0)
-            {
-                ZoneChannels.TryRemove(c.Key, out _);
-                res++;
-            }
-        foreach (var c in PartyChannels)
-            if (c.Value.Members.Count <= 0)
-            {
-                PartyChannels.TryRemove(c.Key, out _);
-                res++;
-            }
-        foreach (var c in RaidChannels)
-            if (c.Value.Members.Count <= 0)
-            {
-                RaidChannels.TryRemove(c.Key, out _);
-                res++;
-            }
-        foreach (var c in GuildChannels)
-            if (c.Value.Members.Count <= 0)
-            {
-                GuildChannels.TryRemove(c.Key, out _);
-                res++;
-            }
-        foreach (var c in FamilyChannels)
-            if (c.Value.Members.Count <= 0)
-            {
-                FamilyChannels.TryRemove(c.Key, out _);
-                res++;
-            }
+        foreach (var c in channels)
+        {
+            if (!c.Value.TryRemoveIfEmpty(() =>
+                {
+                    if (!((ICollection<KeyValuePair<TKey, ChatChannel>>)channels).Remove(c))
+                        return false;
+
+                    ChatIdManager.Instance.ReleaseId(c.Value.InternalId);
+                    return true;
+                }))
+                continue;
+
+            res++;
+        }
+
         return res;
     }
 
@@ -136,8 +141,21 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     /// <returns></returns>
     private bool AddFactionChannel(FactionsEnum factionId, string name)
     {
-        var channel = new ChatChannel { ChatType = ChatType.Ally, Faction = factionId, InternalId = (uint)factionId, InternalName = name };
+        var channel = new ChatChannel { ChatType = ChatType.Ally, Faction = factionId, InternalId = ChatIdManager.Instance.GetNextId(), InternalName = name };
         return FactionChannels.TryAdd(factionId, channel);
+    }
+
+    /// <summary>
+    /// Adds a courtroom chat channel (Trial/Jury/Judge)
+    /// </summary>
+    /// <param name="region"></param>
+    /// <param name="factionId"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    private bool AddTrialChatChannel(CourtRoomRegion region, FactionsEnum factionId, string name)
+    {
+        var channel = new ChatChannel { ChatType = ChatType.Judge, Faction = factionId, InternalId = ChatIdManager.Instance.GetNextId(), InternalName = name };
+        return CourtRoomChannels.TryAdd(region, channel);
     }
 
     /// <summary>
@@ -170,7 +188,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     private bool AddNationChannel(Race race, FactionsEnum factionDisplayId, string name)
     {
         var mRace = ((byte)race - 1) & 0xFC;
-        var channel = new ChatChannel { ChatType = ChatType.Region, Faction = factionDisplayId, InternalId = mRace, InternalName = name };
+        var channel = new ChatChannel { ChatType = ChatType.Region, Faction = factionDisplayId, InternalId = ChatIdManager.Instance.GetNextId(), InternalName = name };
         return NationChannels.TryAdd(mRace, channel);
     }
 
@@ -205,7 +223,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     /// <returns></returns>
     private bool AddZoneChannel(uint zoneGroupId, string name)
     {
-        var channel = new ChatChannel { ChatType = ChatType.Shout, SubType = (short)zoneGroupId, InternalId = zoneGroupId, InternalName = name };
+        var channel = new ChatChannel { ChatType = ChatType.Shout, SubType = (short)zoneGroupId, InternalId = ChatIdManager.Instance.GetNextId(), InternalName = name };
         return ZoneChannels.TryAdd(zoneGroupId, channel);
     }
 
@@ -245,7 +263,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     /// <returns></returns>
     private bool AddGuildChannel(Expedition guild)
     {
-        var channel = new ChatChannel { ChatType = ChatType.Clan, SubType = (short)guild.Id, InternalId = (uint)guild.Id, InternalName = guild.Name };
+        var channel = new ChatChannel { ChatType = ChatType.Clan, SubType = (short)guild.Id, InternalId = ChatIdManager.Instance.GetNextId(), InternalName = guild.Name };
         return GuildChannels.TryAdd(guild.Id, channel);
     }
 
@@ -281,7 +299,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     /// <returns></returns>
     private bool AddFamilyChannel(uint familyId)
     {
-        var channel = new ChatChannel { ChatType = ChatType.Family, SubType = (short)familyId, InternalId = familyId, InternalName = $"Family {familyId}" };
+        var channel = new ChatChannel { ChatType = ChatType.Family, SubType = (short)familyId, InternalId = ChatIdManager.Instance.GetNextId(), InternalName = $"Family {familyId}" };
         return FamilyChannels.TryAdd(familyId, channel);
     }
 
@@ -317,7 +335,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     /// <returns></returns>
     private bool AddPartyChannel(uint partyId)
     {
-        var channel = new ChatChannel { ChatType = ChatType.Party, SubType = (short)partyId, InternalId = partyId, InternalName = $"Party({partyId})" };
+        var channel = new ChatChannel { ChatType = ChatType.Party, SubType = (short)partyId, InternalId = ChatIdManager.Instance.GetNextId(), InternalName = $"Party({partyId})" };
         return PartyChannels.TryAdd(partyId, channel);
     }
 
@@ -370,7 +388,7 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
     /// <returns></returns>
     private bool AddRaidChannel(uint partyId)
     {
-        var channel = new ChatChannel { ChatType = ChatType.Raid, SubType = (short)partyId, InternalId = partyId, InternalName = $"Raid({partyId})" };
+        var channel = new ChatChannel { ChatType = ChatType.Raid, SubType = (short)partyId, InternalId = ChatIdManager.Instance.GetNextId(), InternalName = $"Raid({partyId})" };
         return RaidChannels.TryAdd(partyId, channel);
     }
 
@@ -398,5 +416,27 @@ public class ChatManager : Singleton<ChatManager>, IChatManager
             Logger.Error("不应该从 GetRaidChat 获取到空频道！");
             return NullChannel;
         }
+    }
+
+    /// <summary>
+    /// Gets the trial channel for a players Faction
+    /// </summary>
+    /// <param name="character"></param>
+    /// <returns></returns>
+    public ChatChannel GetTrialChat(Character character)
+    {
+        var courtRegion = TrialManager.Instance.GetCourtRoomRegionByFaction(character.Faction.MotherId);
+        if (courtRegion == CourtRoomRegion.Invalid)
+        {
+            // We don't have a home trial channel, try to check what we are part of
+            var trial = TrialManager.Instance.GetParticipatingTrial(character);
+            return CourtRoomChannels.GetValueOrDefault(trial.CourtRegion);
+        }
+        return CourtRoomChannels.GetValueOrDefault(courtRegion);
+    }
+
+    public ChatChannel GetTrialChat(CourtRoomRegion courtRegion)
+    {
+        return CourtRoomChannels.GetValueOrDefault(courtRegion);
     }
 }
