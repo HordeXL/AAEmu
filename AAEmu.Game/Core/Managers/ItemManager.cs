@@ -410,7 +410,11 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
         return true;
     }
 
-    public void Load() => Load(SQLite.CreateConnection());
+    public void Load()
+    {
+        using var connection = SQLite.CreateConnection();
+        Load(connection);
+    }
 
     public void Load(SqliteConnection connection)
     {
@@ -1913,6 +1917,24 @@ public class ItemManager(ISkillManager skillManager, IItemIdManager itemIdManage
                 _removedItems.Remove(itemId);
         }
         return itemId;
+    }
+
+    /// <summary>
+    /// Queues an item's DB row for deletion on the next save WITHOUT freeing its
+    /// runtime id or removing it from the live item list. Used when an item moves
+    /// into a non-persisted (SlotType.None) container such as the BuyBack container,
+    /// so its old persisted row is not reloaded and duplicated on relogin. Because
+    /// Save() deletes queued rows before re-inserting current items, buying the item
+    /// back (which moves it into a persisted container again) still persists correctly.
+    /// </summary>
+    /// <param name="itemId">itemId whose database row should be removed</param>
+    public void MarkItemForDbDeletion(ulong itemId)
+    {
+        lock (_removedItems)
+        {
+            if (itemId != 0 && !_removedItems.Contains(itemId))
+                _removedItems.Add(itemId);
+        }
     }
 
     /// <summary>
