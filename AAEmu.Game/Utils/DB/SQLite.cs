@@ -16,10 +16,18 @@ public static class SQLite
             Logger.Fatal("Server database does not exist: {0} !", dbPath);
             throw new FileNotFoundException("Server database does not exist: " + dbPath);
         }
-        var connection = new SqliteConnection($"Data Source=file:{dbPath}; Mode=ReadOnly");
+        var connection = new SqliteConnection($"Data Source={dbPath}; Mode=ReadOnly; Pooling=False");
         try
         {
             connection.Open();
+            using (var command = connection.CreateCommand())
+            {
+                // compact.sqlite3 is read-only reference data; spilled sorter files must stay in memory.
+                // On-disk SQLite temp files fail to be created inside the game server process
+                // (SQLITE_CANTOPEN 14, e.g. DoodadManager's ORDER BY full-table reads).
+                command.CommandText = "PRAGMA temp_store = MEMORY";
+                command.ExecuteNonQuery();
+            }
         }
         catch (Exception e)
         {
